@@ -40,35 +40,54 @@ Access at: **http://localhost:3000**
 ```
 src/
 ├── app/
-│   ├── page.tsx              # Home page
+│   ├── page.tsx              # Landing page (home)
 │   ├── layout.tsx            # Root layout
 │   ├── globals.css           # Global styles
-│   └── vetting/
-│       ├── layout.tsx        # Vetting routes layout
-│       ├── login/
-│       │   └── page.tsx      # Login page
-│       ├── register/
-│       │   └── page.tsx      # Pre-registration page
-│       └── dashboard/
-│           └── page.tsx      # Driver portal
-├── components/
+│   ├── apply/
+│   │   └── page.tsx          # Apply interest form
 │   ├── vetting/
-│   │   ├── PreRegistrationForm.tsx
-│   │   ├── DriverDashboard.tsx
-│   │   └── AdminDashboard.tsx
-│   └── shared/
-│       └── Header.tsx
+│   │   ├── login/            # Driver login
+│   │   ├── register/         # Pre-registration
+│   │   └── dashboard/        # Driver portal
+│   ├── admin/
+│   │   ├── checklist/        # Vetting checklist
+│   │   ├── interview/        # Assessment tool
+│   │   └── vetting/          # Admin dashboard
+│   └── assessment/
+│       └── [token]/          # Dynamic assessment page
+├── components/
+│   ├── LandingHeader.tsx     # Nav header
+│   ├── EnhancedHeroSection.tsx
+│   ├── ServiceTabs.tsx
+│   ├── FleetSpotlight.tsx
+│   ├── ContactForm.tsx
+│   └── (other components)
 ├── context/
 │   └── AuthContext.tsx       # Global auth state
 ├── services/
-│   └── api/
-│       ├── client.ts         # HTTP client
-│       ├── auth.ts           # Auth API
-│       ├── drivers.ts        # Drivers API
-│       └── admin.ts          # Admin API
-└── types/
-    └── index.ts              # TypeScript types
+│   └── api/                  # API clients
+└── lib/
+    └── firebase.ts           # Firebase config
 ```
+
+---
+
+## 🏠 Navigation
+
+### Public Pages
+- **`/`** - Landing page (hero, services, fleet, contact)
+- **`/apply`** - Apply to drive (interest form)
+
+### Driver Pages (Protected)
+- **`/vetting/login`** - Driver login
+- **`/vetting/register`** - Pre-registration form
+- **`/vetting/dashboard`** - Driver portal
+
+### Admin Pages (Protected)
+- **`/admin/checklist`** - Vetting checklist
+- **`/admin/interview`** - Assessment tool
+- **`/admin/vetting`** - Admin dashboard
+- **`/assessment/[token]`** - Assessment (dynamic, shared link)
 
 ---
 
