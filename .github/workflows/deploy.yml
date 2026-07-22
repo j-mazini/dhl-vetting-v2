@@ -25,19 +25,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Install dependencies
         working-directory: aplicacoes/ba-express-vetting
         run: npm ci
 
-      - name: Build Next.js
+      - name: Build Next.js (static export)
         working-directory: aplicacoes/ba-express-vetting
         run: npm run build
-
-      - name: Export static site
-        working-directory: aplicacoes/ba-express-vetting
-        run: npx next export -o out
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
