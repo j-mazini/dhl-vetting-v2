@@ -246,3 +246,8 @@ export default function CandidateAssessmentPage() {
     </main>
   );
 }
+
+// Para static export, retorna array vazio (nenhuma página será pré-gerada)
+export async function generateStaticParams() {
+  return [];
+}
