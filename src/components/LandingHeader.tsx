@@ -44,11 +44,11 @@ export function LandingHeader() {
           type="button"
           className={styles.logoBtn}
           onClick={() => go('home')}
-          aria-label="BA Express Ltd — Home"
+          aria-label="DHL Vetting Tracker — Home"
         >
           <Image
-            src="/assets/logo-ba.png"
-            alt="BA Express Ltd."
+            src="/assets/dhl-logo.png"
+            alt="DHL Vetting Tracker"
             width={420}
             height={100}
             className={styles.logoImg}

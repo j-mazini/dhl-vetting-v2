@@ -46,18 +46,17 @@ export function EnhancedHeroSection() {
           {/* Left Content */}
           <m.div className={styles.content} variants={itemVariants}>
             <m.h1 className={styles.title} variants={itemVariants}>
-              Fast, Reliable{' '}
-              <GradientText gradient="primary">Delivery</GradientText> in London
+              DHL Vetting <GradientText gradient="primary">Tracker</GradientText>
             </m.h1>
 
             <m.p className={styles.subtitle} variants={itemVariants}>
-              Professional courier service for businesses of all sizes. Same-day
-              delivery with real-time tracking and 99% on-time guarantee.
+              Streamline your driver vetting process with our comprehensive platform.
+              Automated checks, secure document management, and real-time assessments.
             </m.p>
 
             <m.div className={styles.actions} variants={itemVariants}>
               <AnimatedButton variant="primary" size="lg">
-                Start Shipping Today
+                Apply to Drive
               </AnimatedButton>
               <AnimatedButton variant="secondary" size="lg">
                 Learn More
@@ -67,15 +66,15 @@ export function EnhancedHeroSection() {
             <m.div className={styles.features} variants={itemVariants}>
               <div className={styles.feature}>
                 <span className={styles.featureIcon}>✓</span>
-                <span>Same-day delivery</span>
+                <span>Quick assessment</span>
               </div>
               <div className={styles.feature}>
                 <span className={styles.featureIcon}>✓</span>
-                <span>Real-time tracking</span>
+                <span>Secure documents</span>
               </div>
               <div className={styles.feature}>
                 <span className={styles.featureIcon}>✓</span>
-                <span>24/7 support</span>
+                <span>Real-time updates</span>
               </div>
             </m.div>
           </m.div>
