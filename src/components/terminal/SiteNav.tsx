@@ -52,6 +52,9 @@ export function SiteNav() {
         <a href="#coverage">COVERAGE</a>
       </nav>
       <div className="topbar-right">
+        <Link className="topbar-cta" href="/vetting/register">
+          APPLY TO DRIVE
+        </Link>
         <select
           className="theme-select"
           aria-label="Colour mode"
