@@ -1,0 +1,157 @@
+.form {
+  width: 100%;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.row2 {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .row2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.field label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.82rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.input:hover,
+.textarea:hover {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  box-shadow:
+    0 0 0 3px rgba(191, 29, 35, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.inputError {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.02) !important;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.72rem;
+  margin-top: -0.25rem;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.textarea {
+  min-height: 132px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.submit {
+  margin-top: 0.35rem;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  pointer-events: none;
+}
+
+.status {
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.statusOk {
+  background: rgba(22, 163, 74, 0.08);
+  color: #15803d;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.statusErr {
+  background: rgba(185, 28, 28, 0.06);
+  color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.18);
+}
+
+.spin {
+  animation: contactFormSpin 0.75s linear infinite;
+}
+
+@keyframes contactFormSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .textarea {
+    transition: none;
+  }
+
+  .spin {
+    animation: none;
+  }
+}

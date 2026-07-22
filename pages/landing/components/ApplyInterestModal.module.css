@@ -1,0 +1,313 @@
+/* Apply modal — styled as a Terminal gate card / boarding pass.
+   Uses the terminal-site.css custom properties (--panel, --line, --letter,
+   --dim, --red…) so it follows the dark/light theme toggle automatically. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 110%, rgba(158, 0, 6, 0.25), transparent 60%),
+    rgba(5, 6, 8, 0.78);
+  animation: backdropIn 0.25s ease;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 92vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  animation: modalIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Gate header strip ─────────────────────────────── */
+.gateHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 18px;
+  background: var(--gatehead-bg);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+}
+
+.gateHead > span:first-child {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now {
+  color: var(--red-light);
+  animation: blink 1.4s step-end infinite;
+  flex: none;
+}
+
+@keyframes blink {
+  50% { opacity: 0.25; }
+}
+
+.closeButton {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--dim);
+  cursor: pointer;
+  transition: border-color 0.25s, color 0.25s;
+}
+
+.closeButton:hover {
+  border-color: var(--red);
+  color: var(--red-light);
+}
+
+/* ── Body ──────────────────────────────────────────── */
+.body {
+  padding: 26px 24px 22px;
+}
+
+.heading {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: clamp(1.9rem, 4.5vw, 2.5rem);
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--letter);
+}
+
+.headingDot {
+  color: var(--red-light);
+}
+
+.lede {
+  margin: 0 0 22px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--dim);
+  max-width: 44ch;
+}
+
+/* ── Boarding sequence (01 → 02 → 03) ──────────────── */
+.sequence {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: 0 0 20px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.hop {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 13px;
+  background: var(--head-bg);
+  font-size: 0.82rem;
+  color: var(--letter);
+}
+
+.hop small {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--dim);
+}
+
+.hopFinal small {
+  color: var(--red-light);
+}
+
+/* ── Telex message ticket ──────────────────────────── */
+.ticket {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.ticketHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: var(--head-bg);
+  border-bottom: 1px dashed var(--consign-line);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--dim);
+}
+
+.ticketText {
+  margin: 0;
+  padding: 16px 14px;
+  max-height: 220px;
+  overflow-y: auto;
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: var(--letter);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background: var(--board-bg);
+}
+
+.ticketFoot {
+  padding: 7px 14px;
+  border-top: 1px dashed var(--consign-line);
+  background: var(--head-bg);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--red-light);
+}
+
+/* ── Actions (topbar-cta pill language) ────────────── */
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.cta {
+  flex: 1;
+  min-width: 150px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  border: 1.5px solid var(--red);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--red-light);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, transform 0.3s, border-color 0.3s;
+}
+
+.cta:hover {
+  background: var(--red);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.ctaPrimary {
+  background: var(--red);
+  color: #fff;
+}
+
+.ctaPrimary:hover {
+  background: var(--red-bright);
+  border-color: var(--red-bright);
+}
+
+.ctaCopied {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.ctaCopied:hover {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+/* ── Foot contact line ─────────────────────────────── */
+.footNote {
+  margin: 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--footer-dim);
+}
+
+.footNote a {
+  color: var(--red-light);
+  text-decoration: none;
+}
+
+.footNote a:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ────────────────────────────────────── */
+@media (max-width: 560px) {
+  .body {
+    padding: 20px 16px 18px;
+  }
+
+  .sequence {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .cta {
+    width: 100%;
+  }
+
+  .ticketText {
+    max-height: 170px;
+  }
+}
+
+/* ── Motion preferences ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .modal {
+    animation: none;
+  }
+
+  .now {
+    animation: none;
+  }
+
+  .cta:hover {
+    transform: none;
+  }
+}
