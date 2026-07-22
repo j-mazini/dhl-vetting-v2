@@ -1,56 +1,52 @@
-# Organizacao do Workspace
+# DHL Vetting Tracker v2
 
-Este workspace foi organizado por responsabilidade para facilitar a navegacao entre front, back, configuracoes, documentos e projetos separados.
+Vetting system integrado com BA Express landing page. Desenvolvido com Next.js, Firebase e admin portal.
+
+**GitHub:** https://github.com/j-mazini/dhl-vetting-v2  
+**Live:** https://j-mazini.github.io/dhl-vetting-v2/ (GitHub Pages)
 
 ## Estrutura
 
 ```text
 .
 ├── aplicacoes/
-│   ├── backend-api/            # Backend NestJS
-│   ├── ba-express-vetting/     # App Next.js integrado: landing, apply, vetting e admin
-│   └── dhl-vetting-arquivo/    # Copia estatica/arquivo do tracker DHL
+│   ├── backend-api/            # Backend NestJS (APIs e integracoes)
+│   ├── ba-express-vetting/     # App Next.js: landing, apply, vetting, admin
+│   └── dhl-vetting-arquivo/    # Copia estatica do tracker DHL
 ├── configuracoes/
-│   ├── firebase/               # Firebase, rules e CORS
-│   └── git/                    # Configuracao Git preservada da raiz antiga
-├── documentos/
-│   ├── documentos-originais/   # DOCX/TXT originais
-│   ├── guias/                  # Setup, status e integracoes
-│   └── referencias/            # Documentacao tecnica
-├── projetos/
-│   ├── ba-express-dos-prototipo/  # Repositorio do prototipo BA Express DOS
-│   └── logix-sphere-legado/    # Projeto legado da LogixSphere
-├── landing-page-legado/        # Landing antiga preservada
-├── vetting-legado/             # Vetting estatico antigo preservado
-└── arquivo/
-    ├── artefatos-teste/        # PDFs e saidas de teste
-    ├── arquivos-sistema/       # Arquivos locais do sistema
-    ├── cache-build/            # Cache/builds movidos da raiz
-    └── logs-debug/             # Logs de debug
+│   ├── firebase/               # Firestore rules e CORS
+│   └── git/                    # Configuracao Git
+├── .github/workflows/
+│   └── deploy.yml              # Auto-deploy para GitHub Pages
+└── [legado]/                   # Projetos e arquivos anteriores
 ```
+
+## Deploy Automático
+
+- **Trigger:** Push na branch `main`
+- **Build:** Next.js build + static export
+- **Deploy:** GitHub Pages (branch `gh-pages`)
+- **Status:** Ver em https://github.com/j-mazini/dhl-vetting-v2/actions
 
 ## Caminhos Principais
 
-- Prototipo BA Express DOS: `projetos/ba-express-dos-prototipo/src/BA_Express_DOS_Live_Preview.html`
-- Vetting estatico legado: `vetting-legado/dhl-vetting-tracker/index.html`
-- Copia estatica do tracker DHL: `aplicacoes/dhl-vetting-arquivo/index.html`
-- Backend API: `aplicacoes/backend-api/`
-- App BA Express Vetting: `aplicacoes/ba-express-vetting/`
+- **App Principal:** `aplicacoes/ba-express-vetting/`
+- **Backend API:** `aplicacoes/backend-api/`
+- **Firebase Config:** `configuracoes/firebase/`
+- **Workflow Deploy:** `.github/workflows/deploy.yml`
 
-## Git
+## Dev Local
 
-Repositorios Git ativos neste workspace:
-
-```text
-aplicacoes/backend-api/.git
-aplicacoes/dhl-vetting-arquivo/.git
-aplicacoes/ba-express-vetting/.git
-landing-page-legado/logix-sphere-landing-page/.git
-projetos/ba-express-dos-prototipo/.git
-projetos/logix-sphere-legado/logix-sphere-landing-page/.git
-vetting-legado/dhl-vetting-tracker/.git
+```bash
+cd aplicacoes/ba-express-vetting
+npm install
+npm run dev  # http://localhost:3000
 ```
 
-Os repositorios `landing-page-legado/logix-sphere-landing-page` e `vetting-legado/dhl-vetting-tracker`
-ja possuem `origin` configurado. Os demais estao ativos localmente e aguardam remote.
-# Ba
+## Tech Stack
+
+- **Frontend:** Next.js 14, React 19, Tailwind CSS
+- **Backend:** NestJS, Prisma
+- **Database:** Firebase/Firestore
+- **Auth:** Firebase Authentication
+- **Hosting:** GitHub Pages (static) / Firebase (backend)
