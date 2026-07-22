@@ -7,14 +7,42 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CHECKLIST_STEPS, TOTAL_CHECKLIST_ITEMS } from '@/app/admin/checklist/data/checklist';
-import {
-  inferDriverChecks,
-  type DocFields,
-} from '@/app/admin/checklist/modules/central-driver-record/model';
 import { WorkHistoryForm, type WorkHistoryEntry } from '@/components/vetting/WorkHistoryForm';
 import { useWorkHistory } from '@/hooks/useWorkHistory';
 import styles from './page.module.css';
+
+// Vetting checklist configuration
+const TOTAL_CHECKLIST_ITEMS = 10;
+const CHECKLIST_STEPS = [
+  { id: 'dbs', label: 'DBS Check' },
+  { id: 'dvla', label: 'DVLA Check' },
+  { id: 'insurance', label: 'Insurance Verification' },
+  { id: 'licence', label: 'Driving Licence' },
+  { id: 'rightToWork', label: 'Right to Work' },
+  { id: 'references', label: 'References' },
+  { id: 'address', label: 'Address History' },
+  { id: 'workHistory', label: 'Work History' },
+  { id: 'medicals', label: 'Medicals' },
+  { id: 'interview', label: 'Interview' },
+];
+
+type DocFields = Record<string, any>;
+
+const inferDriverChecks = (data: any): boolean[] => {
+  const checks = [
+    !!data.dbs,
+    !!data.dvla,
+    !!data.insurance,
+    !!data.licence,
+    !!data.rightToWork,
+    !!data.references,
+    !!data.address,
+    !!data.workHistory,
+    !!data.medicals,
+    !!data.interview,
+  ];
+  return checks;
+};
 
 const PROCESS = [
   {

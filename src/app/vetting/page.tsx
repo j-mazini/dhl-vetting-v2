@@ -1,3 +1,14 @@
-import LoginPage from '../login/page';
+'use client';
 
-export default LoginPage;
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function VettingPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/vetting/login');
+  }, [router]);
+
+  return null;
+}
