@@ -53,6 +53,9 @@ SUBMISSION_FIX_COMPLETE.md
 arquivo/
 .claude-octopus/
 
+# GitHub Pages export
+_gh-pages/
+
 # Lock files
 package-lock.json
 yarn.lock
