@@ -7,7 +7,7 @@ export default function ApplyPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/vetting/register');
+    router.replace('/vetting/login');
   }, [router]);
 
   return null;
