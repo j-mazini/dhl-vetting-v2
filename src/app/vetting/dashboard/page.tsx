@@ -739,7 +739,7 @@ export default function CandidateDashboard() {
             <p className={styles.helpText}>
               Submit the apply form using the same email as your Google account, then return here.
             </p>
-            <button className={styles.cardAction} onClick={() => router.push('/apply')}>
+            <button className={styles.cardAction} onClick={() => router.push('/vetting/register')}>
               Start application →
             </button>
           </div>

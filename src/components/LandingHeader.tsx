@@ -71,7 +71,7 @@ export function LandingHeader() {
         </nav>
 
         <div className={styles.actions}>
-          <Link href="/apply" className={styles.cta}>
+          <Link href="/vetting/register" className={styles.cta}>
             Apply to Drive
           </Link>
         </div>
