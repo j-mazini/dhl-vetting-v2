@@ -1,9 +1,9 @@
-# BA Express Vetting System - Frontend
+# DHL Vetting Tracker - Frontend
 
-**Vetting 2.0 System** integrated with BA Express landing page.
+**Landing Page + Driver Vetting System**
 
 Frontend: Next.js 16 + React 19 + TypeScript  
-Backend: NestJS + Firestore  
+Backend: Firebase Firestore + REST API  
 Status: 🟢 Ready for development
 
 ---
@@ -40,54 +40,44 @@ Access at: **http://localhost:3000**
 ```
 src/
 ├── app/
-│   ├── page.tsx              # Landing page (home)
-│   ├── layout.tsx            # Root layout
-│   ├── globals.css           # Global styles
-│   ├── apply/
-│   │   └── page.tsx          # Apply interest form
-│   ├── vetting/
-│   │   ├── login/            # Driver login
-│   │   ├── register/         # Pre-registration
-│   │   └── dashboard/        # Driver portal
-│   ├── admin/
-│   │   ├── checklist/        # Vetting checklist
-│   │   ├── interview/        # Assessment tool
-│   │   └── vetting/          # Admin dashboard
-│   └── assessment/
-│       └── [token]/          # Dynamic assessment page
+│   ├── page.tsx                    # 🏠 Landing page
+│   ├── layout.tsx                  # Root layout
+│   ├── globals.css                 # Global styles
+│   ├── vetting/                    # 🔐 Vetting flow
+│   │   ├── login/page.tsx          # Driver login
+│   │   ├── register/page.tsx       # Pre-registration
+│   │   ├── dashboard/page.tsx      # Driver portal
+│   │   └── layout.tsx              # Vetting layout
+│   └── api/                        # Backend integrations
 ├── components/
-│   ├── LandingHeader.tsx     # Nav header
-│   ├── EnhancedHeroSection.tsx
-│   ├── ServiceTabs.tsx
-│   ├── FleetSpotlight.tsx
-│   ├── ContactForm.tsx
-│   └── (other components)
+│   ├── LandingHeader.tsx           # Navigation
+│   ├── EnhancedHeroSection.tsx     # Hero section
+│   ├── ServiceTabs.tsx             # Services showcase
+│   ├── FleetSpotlight.tsx          # Fleet info
+│   ├── ContactForm.tsx             # Contact
+│   ├── vetting/                    # Vetting components
+│   │   ├── PreRegistrationForm.tsx
+│   │   └── WorkHistoryForm.tsx
+│   └── (other UI components)
 ├── context/
-│   └── AuthContext.tsx       # Global auth state
+│   └── AuthContext.tsx             # Global auth state
 ├── services/
-│   └── api/                  # API clients
+│   └── api/                        # API clients
 └── lib/
-    └── firebase.ts           # Firebase config
+    └── firebase.ts                 # Firebase config
 ```
 
 ---
 
 ## 🏠 Navigation
 
-### Public Pages
-- **`/`** - Landing page (hero, services, fleet, contact)
-- **`/apply`** - Apply to drive (interest form)
+### Landing Page (Public)
+- **`/`** - Landing page with hero, services, fleet, and contact
 
-### Driver Pages (Protected)
-- **`/vetting/login`** - Driver login
-- **`/vetting/register`** - Pre-registration form
-- **`/vetting/dashboard`** - Driver portal
-
-### Admin Pages (Protected)
-- **`/admin/checklist`** - Vetting checklist
-- **`/admin/interview`** - Assessment tool
-- **`/admin/vetting`** - Admin dashboard
-- **`/assessment/[token]`** - Assessment (dynamic, shared link)
+### Vetting Flow (Driver Pages)
+- **`/vetting/login`** - Driver login with email/password
+- **`/vetting/register`** - Pre-registration form (personal info)
+- **`/vetting/dashboard`** - Driver portal (documents, status, progress)
 
 ---
 
