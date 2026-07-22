@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BA Express DOS — Day 30 Live Preview</title>
+<style>
+:root{
+  --ba-red:#bf1d23; --ba-red-bright:#d42a32; --ba-red-deep:#9e0006;
+  --ba-navy:#374151; --ba-navy-soft:#4b5563; --ba-navy-deep:#111827;
+  --navy:var(--ba-navy); --navy2:var(--ba-navy-soft); --navy3:var(--ba-navy-deep);
+  --coral:var(--ba-red); --coral2:#fde8e9;
+  --green:#2E7D54; --green2:#E5F3EC;
+  --amber:#C77800; --amber2:#FFF4E0;
+  --blue:#1F4E8C; --blue2:#E1ECF7;
+  --purple:#7B5BA1; --purple2:#EEE6F6;
+  --bg:#F5F7FA; --card:#FFFFFF; --line:#E4E7EC;
+  --subtle:#667085; --text:#344054;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--navy);font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+a{color:var(--coral);text-decoration:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+
+/* DEMO BANNER */
+.demo-banner{background:linear-gradient(90deg,var(--navy3),var(--navy));color:white;padding:6px 20px;text-align:center;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;border-bottom:2px solid var(--coral)}
+.demo-banner b{color:var(--coral)}
+
+/* TOP NAV */
+.topnav{background:white;border-bottom:1px solid var(--line);padding:0 24px;display:flex;align-items:center;height:56px;position:sticky;top:0;z-index:50;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.topnav .logo{font-weight:800;letter-spacing:0.04em;color:var(--navy);font-size:15px;margin-right:32px}
+.topnav .logo .accent{color:var(--coral)}
+.topnav .logo small{font-weight:600;color:var(--subtle);font-size:11px;letter-spacing:0.08em;display:block;margin-top:-2px}
+.topnav .links{display:flex;gap:2px;flex:1}
+.topnav .links a{color:var(--subtle);font-size:13px;font-weight:600;padding:8px 14px;border-radius:6px;transition:all 0.15s;cursor:pointer}
+.topnav .links a:hover{background:#F2F4F7;color:var(--navy)}
+.topnav .links a.active{background:var(--coral2);color:var(--coral)}
+.topnav .user{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--navy)}
+.topnav .user .avatar{width:30px;height:30px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px}
+
+/* CONTENT WRAP */
+.wrap{max-width:1280px;margin:0 auto;padding:24px}
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn 0.25s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* PAGE TITLE */
+.page-title{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;border-bottom:2px solid var(--line);padding-bottom:14px}
+.page-title h1{margin:0 0 4px;font-size:22px;font-weight:800;color:var(--navy)}
+.page-title p{margin:0;color:var(--subtle);font-size:13px}
+.page-title .actions{display:flex;gap:8px}
+
+/* CARDS */
+.card{background:white;border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,0.03)}
+.card h3{margin:0 0 12px;font-size:13px;color:var(--coral);font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.card h2{margin:0 0 10px;font-size:16px;font-weight:700;color:var(--navy)}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+
+/* KPI TILES */
+.kpi{background:white;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .v{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
+.kpi .v small{font-size:13px;color:var(--subtle);font-weight:600}
+.kpi .l{font-size:11px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.05em;margin-top:6px}
+.kpi .d{font-size:11px;font-weight:700;margin-top:4px}
+.kpi .d.up{color:var(--green)} .kpi .d.dn{color:var(--coral)}
+.kpi.coral .v{color:var(--coral)} .kpi.green .v{color:var(--green)} .kpi.amber .v{color:var(--amber)}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid transparent;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--coral);color:white}
+.btn.primary:hover{background:var(--ba-red-bright)}
+.btn.secondary{background:white;color:var(--navy);border-color:var(--line)}
+.btn.secondary:hover{background:#F8FAFC}
+.btn.dark{background:var(--navy);color:white}
+.btn.dark:hover{background:var(--navy2)}
+.btn.ghost{color:var(--coral)}
+.btn:disabled,.btn.disabled{opacity:0.5;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:11px}
+
+/* PILLS / BADGES */
+.pill{display:inline-block;background:#EEF1F6;color:var(--navy);border:1px solid var(--line);padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:0.02em}
+.pill.coral{background:var(--coral2);color:var(--coral);border-color:rgba(191,29,35,0.24)}
+.pill.amber{background:var(--amber2);color:var(--amber);border-color:#F0DBA8}
+.pill.green{background:var(--green2);color:var(--green);border-color:#B5DCC4}
+.pill.blue{background:var(--blue2);color:var(--blue);border-color:#C2D6EE}
+.pill.purple{background:var(--purple2);color:var(--purple);border-color:#D4C2E5}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:#F8FAFC;color:var(--subtle);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.06em}
+tr.clickable{cursor:pointer;transition:background 0.1s}
+tr.clickable:hover{background:#F8FAFC}
+
+.av{width:28px;height:28px;border-radius:50%;background:var(--navy);color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;flex-shrink:0}
+.av.c1{background:#1F4E8C} .av.c2{background:#7B5BA1} .av.c3{background:var(--coral)} .av.c4{background:var(--green)} .av.c5{background:var(--amber)}
+
+/* === SCREEN 1: WELCOME === */
+.hero{background:linear-gradient(135deg,var(--navy3),var(--navy) 60%,var(--navy2));color:white;padding:48px 40px;border-radius:14px;position:relative;overflow:hidden;border-left:6px solid var(--coral)}
+.hero::before{content:"";position:absolute;right:-100px;top:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(226,50,52,0.18),transparent 70%)}
+.hero .ribbon{background:var(--coral);color:white;display:inline-block;padding:4px 12px;border-radius:4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;margin-bottom:14px}
+.hero h1{margin:0 0 8px;font-size:34px;font-weight:800;line-height:1.1}
+.hero p{margin:0;color:#C7CCD4;max-width:720px;font-size:15px;line-height:1.6}
+.hero .row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+.hero .stat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:14px}
+.hero .stat .v{font-size:24px;font-weight:800;color:white}
+.hero .stat .v small{font-size:12px;color:#A8B0BC;font-weight:600}
+.hero .stat .l{font-size:10px;color:#A8B0BC;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+
+.tour-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.tour-card{background:white;border:1px solid var(--line);border-radius:10px;padding:16px;transition:all 0.2s;cursor:pointer;border-left:4px solid var(--coral)}
+.tour-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.07)}
+.tour-card .num{font-size:11px;color:var(--coral);font-weight:800;letter-spacing:0.06em}
+.tour-card h4{margin:4px 0 6px;font-size:14px;color:var(--navy);font-weight:700}
+.tour-card p{margin:0;font-size:12px;color:var(--subtle);line-height:1.5}
+
+/* === SCREEN 2: APPLICATION FORM === */
+.applybg{background:#F5F7FA;min-height:600px;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.applybg .top{background:var(--navy);color:white;padding:14px 22px;display:flex;justify-content:space-between;align-items:center}
+.applybg .top .logo{font-weight:800;font-size:15px}
+.applybg .top .logo .accent{color:var(--coral)}
+.applybg .progresswrap{background:#F2F4F7;padding:18px 22px}
+.applybg .progress{display:flex;gap:4px}
+.applybg .progress .step{flex:1;height:6px;border-radius:3px;background:#E4E7EC}
+.applybg .progress .step.done{background:var(--green)}
+.applybg .progress .step.active{background:var(--coral)}
+.applybg .pl{display:flex;gap:4px;margin-top:8px;font-size:10px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.05em;font-weight:600}
+.applybg .pl .step{flex:1;text-align:center}
+.applybg .pl .step.done{color:var(--green)}
+.applybg .pl .step.active{color:var(--coral);font-weight:700}
+.applybg .formarea{padding:24px}
+.applybg h3{margin:0 0 4px;font-size:18px;color:var(--navy)}
+.applybg .formsub{color:var(--subtle);font-size:13px;margin-bottom:18px}
+.formfield{margin-bottom:14px}
+.formfield label{display:block;font-size:11px;color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px}
+.formfield input,.formfield select,.formfield textarea{width:100%;background:#F9FAFB;border:1px solid var(--line);padding:9px 11px;border-radius:5px;font-size:13px;color:var(--navy);outline:none;transition:all 0.15s}
+.formfield input:focus,.formfield select:focus,.formfield textarea:focus{background:white;border-color:var(--coral);box-shadow:0 0 0 3px rgba(226,50,52,0.08)}
+.formrow2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.formrow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.helpbox{background:var(--amber2);border-left:3px solid var(--amber);padding:10px 14px;font-size:12px;color:#6E4500;border-radius:4px;margin:10px 0}
+.privacybox{background:var(--blue2);border-left:3px solid var(--blue);padding:10px 14px;font-size:12px;color:var(--blue);border-radius:4px;margin:10px 0}
+.checkrow{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);margin-bottom:8px}
+.checkrow input[type=checkbox]{margin-top:2px}
+.actionrow{display:flex;justify-content:space-between;padding-top:16px;margin-top:10px;border-top:1px solid var(--line)}
+
+/* === SCREEN 3: DASHBOARD === */
+.funnel{background:white;border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.funnel-row{display:grid;grid-template-columns:140px 1fr 60px;gap:10px;margin-bottom:6px;align-items:center}
+.funnel-row .lbl{font-size:11px;font-weight:700;color:var(--navy)}
+.funnel-row .bar{height:24px;border-radius:4px;color:white;font-size:11px;font-weight:700;padding:5px 10px;display:flex;align-items:center;background:var(--navy)}
+.funnel-row .bar.b2{background:var(--navy2)}
+.funnel-row .bar.b3{background:var(--blue)}
+.funnel-row .bar.b4{background:var(--coral)}
+.funnel-row .bar.b5{background:var(--amber)}
+.funnel-row .bar.b6{background:var(--green)}
+.funnel-row .pct{font-size:11px;color:var(--subtle);text-align:right;font-weight:600}
+
+.queue-row{display:grid;grid-template-columns:36px 1fr 110px 100px;gap:10px;align-items:center;padding:9px 12px;background:white;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.1s}
+.queue-row:hover{border-color:var(--coral);background:rgba(191,29,35,0.035)}
+.queue-row .name{font-weight:700;color:var(--navy);font-size:13px}
+.queue-row .meta{font-size:11px;color:var(--subtle);margin-top:1px}
+.queue-row .age{font-size:11px;color:var(--subtle);text-align:right}
+
+.alert-strip{background:var(--coral2);border:1px solid rgba(191,29,35,0.24);border-left:4px solid var(--coral);padding:10px 14px;border-radius:6px;font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.alert-strip b{color:var(--coral)}
+
+.act{padding:8px 0;border-bottom:1px solid var(--line);font-size:11.5px}
+.act:last-child{border-bottom:none}
+.act .when{color:var(--subtle);font-size:10px}
+.act b{color:var(--navy)}
+
+/* === SCREEN 5: DRIVER RECORD === */
+.rec-grid{display:grid;grid-template-columns:240px 1fr 280px;gap:0;background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:600px}
+.rec-left{background:var(--navy);color:white;padding:22px 18px}
+.rec-left .name{font-weight:800;font-size:17px;margin-bottom:2px}
+.rec-left .id{font-size:11px;color:#A8B0BC;font-family:monospace;margin-bottom:18px}
+.rec-left .stage-list{font-size:12px}
+.rec-left .stage-item{padding:8px 10px;border-radius:5px;margin-bottom:3px;display:flex;align-items:center;gap:8px;opacity:0.65;transition:all 0.15s}
+.rec-left .stage-item.done{background:rgba(46,125,84,0.18);opacity:1}
+.rec-left .stage-item.active{background:var(--coral);opacity:1;font-weight:700}
+.rec-left .stage-item .check{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.2);display:inline-block}
+.rec-left .stage-item.done .check{background:var(--green)}
+.rec-left .stage-item.active .check{background:white}
+.rec-left .quick{margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.1)}
+.rec-left .quick h6{font-size:10px;color:#A8B0BC;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 10px}
+.rec-left .quick button{display:block;width:100%;background:rgba(255,255,255,0.06);color:white;border:1px solid rgba(255,255,255,0.12);padding:8px 10px;border-radius:5px;font-size:11px;font-weight:600;text-align:left;margin-bottom:5px;transition:all 0.15s}
+.rec-left .quick button:hover{background:rgba(255,255,255,0.12);border-color:var(--coral)}
+
+.rec-main{padding:22px;background:#F8FAFC}
+.rec-tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:18px;flex-wrap:wrap}
+.rec-tab{padding:8px 14px;font-size:11px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer}
+.rec-tab.active{color:var(--coral);border-bottom-color:var(--coral)}
+.rec-tab:hover:not(.active){color:var(--navy)}
+.rec-panel{background:white;border:1px solid var(--line);border-radius:8px;padding:16px 20px;margin-bottom:12px;display:none}
+.rec-panel.active{display:block}
+.rec-panel h4{margin:0 0 12px;font-size:12px;color:var(--coral);text-transform:uppercase;letter-spacing:0.05em}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;font-size:12px}
+.fg .lbl{color:var(--subtle);text-transform:uppercase;font-size:10px;letter-spacing:0.05em;margin-bottom:2px}
+.fg .val{color:var(--navy);font-weight:600;font-size:13px}
+.fg .val.green{color:var(--green)}
+.fg .val.amber{color:var(--amber)}
+.fg .val.coral{color:var(--coral)}
+
+.rec-right{background:white;border-left:1px solid var(--line);padding:20px}
+.rec-right h5{font-size:11px;color:var(--coral);text-transform:uppercase;letter-spacing:0.05em;margin:0 0 12px}
+
+.doc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#F8FAFC;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;font-size:12px}
+.doc-row b{color:var(--navy)}
+
+/* === SCREEN 6: DHL FORM === */
+.dhlbg{background:#F5F7FA;padding:22px;border-radius:14px;border:1px solid var(--line)}
+.dhlbg .head{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.dhlbg .head h3{margin:0;font-size:18px;color:var(--navy)}
+.fillban{background:var(--green2);border:1px solid #B5DCC4;border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin-bottom:14px;font-size:13px;color:var(--green);display:flex;justify-content:space-between;align-items:center}
+.fsec{background:white;border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin-bottom:10px}
+.fsec h4{margin:0 0 12px;font-size:12px;color:var(--coral);text-transform:uppercase;letter-spacing:0.06em}
+.fsec .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px;font-size:12px}
+.fsec .lbl{color:var(--subtle);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px}
+.fsec .val{color:var(--navy);font-weight:600;padding:7px 11px;background:#EEF1F6;border-radius:5px;border-left:3px solid var(--green);display:flex;justify-content:space-between;align-items:center}
+.fsec .val .src{font-size:9px;color:var(--green);font-weight:800;letter-spacing:0.04em}
+.fsec .val.miss{background:var(--coral2);border-left-color:var(--coral);color:var(--coral)}
+.fsec .val.miss .src{color:var(--coral)}
+.subc{background:var(--navy);color:white;padding:18px 22px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.subc .info{font-size:13px}
+.subc .info .lbl{font-size:11px;color:#A8B0BC;display:block;margin-bottom:2px}
+
+/* === SCREEN 7: DRIVER PORTAL === */
+.portal{background:#F5F7FA;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.portal .top{background:var(--navy);color:white;padding:14px 22px;display:flex;justify-content:space-between;align-items:center}
+.portal .body{padding:22px;display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.portal h3{margin:0 0 12px;font-size:14px;color:var(--navy)}
+.sched{background:white;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.sched .day{display:grid;grid-template-columns:90px 1fr 100px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:12px;align-items:center}
+.sched .day:last-child{border-bottom:none}
+.sched .day.today{background:var(--coral2);border-left:3px solid var(--coral)}
+.sched .day .d{font-weight:700;color:var(--navy);font-size:11px;text-transform:uppercase}
+.sched .day .r{color:var(--navy)}
+.sched .day .b{font-size:10px;padding:3px 9px;border-radius:10px;background:var(--green2);color:var(--green);font-weight:700;text-align:center}
+.sched .day .b.off{background:#F2F4F7;color:var(--subtle)}
+.tile{background:white;border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:10px;font-size:12px}
+.tile h5{margin:0 0 6px;font-size:11px;color:var(--coral);text-transform:uppercase;letter-spacing:0.05em}
+.tile .big{font-size:22px;font-weight:800;color:var(--navy);line-height:1;margin-bottom:4px}
+.tile .meta{color:var(--subtle);font-size:11px}
+.tile.warn{border-left:4px solid var(--amber)}
+.tile.warn h5{color:var(--amber)}
+.tile.warn .big{color:var(--amber);font-size:14px}
+
+/* === ANALYTICS CHARTS === */
+.chartbox{background:white;border:1px solid var(--line);border-radius:10px;padding:18px}
+.chartbox h3{margin:0 0 6px;font-size:13px;color:var(--coral);font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.chartbox .sub{color:var(--subtle);font-size:11px;margin-bottom:14px}
+.bar-chart{display:flex;align-items:flex-end;height:160px;gap:8px;padding:0 4px;border-bottom:1px solid var(--line)}
+.bar-chart .bar{flex:1;background:linear-gradient(180deg,var(--coral),var(--ba-red-deep));border-radius:4px 4px 0 0;position:relative;transition:all 0.2s;cursor:pointer}
+.bar-chart .bar:hover{filter:brightness(1.1)}
+.bar-chart .bar .label{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:10px;font-weight:700;color:var(--navy)}
+.bar-chart .bar .x{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:9px;color:var(--subtle);font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+
+/* === LIFECYCLE CALENDAR === */
+.cal-row{display:grid;grid-template-columns:32px 1fr 130px 90px 90px;gap:10px;align-items:center;padding:11px 14px;background:white;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:13px}
+.cal-row .icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:white}
+.cal-row .icon.dvla{background:var(--blue)}
+.cal-row .icon.crc{background:var(--purple)}
+.cal-row .icon.rtw{background:var(--amber)}
+.cal-row .icon.training{background:var(--green)}
+
+/* === ARCHITECTURE === */
+.archnotes{background:var(--blue2);border-left:4px solid var(--blue);padding:14px 18px;border-radius:6px;font-size:13px;color:var(--navy);margin:14px 0}
+.archnotes b{color:var(--blue)}
+
+/* MOBILE PORTAL VIEW */
+.portal.mobile-view{max-width:390px;margin:0 auto;box-shadow:0 0 0 10px var(--ba-navy-deep),0 0 0 11px var(--ba-navy),0 22px 50px rgba(0,0,0,0.25);border-radius:36px;overflow:hidden;border:none}
+.portal.mobile-view .top{padding:12px 16px}
+.portal.mobile-view .top .logo{font-size:13px}
+.portal.mobile-view .top .me{font-size:11px}
+.portal.mobile-view .top .me .av{width:24px;height:24px;font-size:9px}
+.portal.mobile-view .body{grid-template-columns:1fr;padding:14px;gap:12px}
+.portal.mobile-view h3{font-size:13px;margin-bottom:8px}
+.portal.mobile-view .sched .day{grid-template-columns:64px 1fr 70px;padding:9px 10px;font-size:11px}
+.portal.mobile-view .sched .day .r{font-size:11px}
+.portal.mobile-view .tile{padding:12px}
+.portal.mobile-view .tile .big{font-size:18px}
+.portal.mobile-view .card{padding:12px}
+.portal.mobile-view .card a{padding:8px 10px!important;font-size:11px}
+.btn.toggle-on{background:var(--navy)!important;color:white!important;border-color:var(--navy)!important}
+
+/* GANTT */
+.gantt{font-family:inherit;font-size:11px;width:100%}
+.gantt .head{display:grid;grid-template-columns:200px repeat(8,1fr);font-weight:700;color:var(--subtle);text-transform:uppercase;font-size:10px;letter-spacing:0.05em;padding:8px 0;border-bottom:2px solid var(--navy)}
+.gantt .head .lbl{padding-right:10px}
+.gantt .head .w{text-align:center}
+.gantt .grow{display:grid;grid-template-columns:200px repeat(8,1fr);align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.gantt .grow .lbl{padding-right:10px;font-weight:600;color:var(--navy);font-size:11.5px}
+.gantt .grow .lbl small{color:var(--subtle);font-weight:500;display:block;font-size:10px}
+.gantt .bar{height:20px;border-radius:4px;color:white;padding:3px 8px;font-size:10px;font-weight:700;display:flex;align-items:center}
+.gantt .bar.training{background:var(--green)}
+.gantt .bar.dvla{background:var(--blue)}
+.gantt .bar.crc{background:var(--purple)}
+.gantt .bar.rtw{background:var(--amber)}
+
+/* C4 STYLED DIAGRAMS */
+.c4-tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:14px}
+.c4-tab{padding:8px 14px;font-size:11px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer}
+.c4-tab.active{color:var(--coral);border-bottom-color:var(--coral)}
+.c4-panel{display:none}
+.c4-panel.active{display:block}
+.c4-level-tag{display:inline-block;background:var(--navy);color:white;font-size:10px;font-weight:800;padding:3px 8px;border-radius:3px;letter-spacing:0.06em;margin-right:8px}
+
+/* SEQUENCE DIAGRAM box */
+.seqbox{background:white;border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(26,34,48,0.65);z-index:100;align-items:center;justify-content:center;padding:24px}
+.modal-bg.open{display:flex}
+.modal{background:white;border-radius:12px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.3);animation:modalIn 0.2s}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{margin:0;font-size:16px;color:var(--navy)}
+.modal-head .x{cursor:pointer;color:var(--subtle);font-size:22px;line-height:1}
+.modal-body{padding:20px 24px;font-size:13px;line-height:1.6;color:var(--text)}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;background:#F8FAFC;border-radius:0 0 12px 12px}
+
+/* SUCCESS BANNER */
+.success-screen{text-align:center;padding:60px 30px}
+.success-screen .check{width:80px;height:80px;border-radius:50%;background:var(--green2);color:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:20px}
+.success-screen h2{margin:0 0 8px;font-size:24px;color:var(--navy)}
+.success-screen p{color:var(--subtle);max-width:480px;margin:0 auto 14px}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  <b>Live preview</b> · BA Express Driver Operating System · Day 30 mockup · click any link / driver / button to explore
+</div>
+
+<!-- TOP NAVIGATION -->
+<div class="topnav">
+  <div class="logo">BA <span class="accent">EXPRESS</span><small>OPERATING SYSTEM</small></div>
+  <div class="links">
+    <a data-go="welcome" class="active">Welcome</a>
+    <a data-go="apply">Apply Now</a>
+    <a data-go="dashboard">Dashboard</a>
+    <a data-go="pipeline">Pipeline</a>
+    <a data-go="record">Driver Record</a>
+    <a data-go="dhl">DHL Form</a>
+    <a data-go="portal">Driver Portal</a>
+    <a data-go="analytics">Analytics</a>
+    <a data-go="lifecycle">Lifecycle</a>
+    <a data-go="audit">Audit Pack</a>
+    <a data-go="arch">Architecture</a>
+  </div>
+  <div class="user">
+    Thiago<span style="color:var(--subtle)">·Director</span>
+    <div class="avatar">TH</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============= WELCOME ============= -->
+<div class="screen active" data-screen="welcome">
+  <div class="hero">
+    <span class="ribbon">Day 30 · Live</span>
+    <h1>BA Express Driver Operating System</h1>
+    <p>This is a fully interactive preview of what your DOS looks and feels like at Day 30. Click any tab in the navigation, any driver row, any button — every screen is wired. The data shown is realistic; in production it pulls live from the Central Driver Record in Notion.</p>
+    <div class="row">
+      <div class="stat"><div class="l">Apply → Active</div><div class="v">6.2 <small>days avg</small></div></div>
+      <div class="stat"><div class="l">Active drivers</div><div class="v">16 <small>across DHL</small></div></div>
+      <div class="stat"><div class="l">SLA hit rate</div><div class="v">94<small>%</small></div></div>
+      <div class="stat"><div class="l">Audit prep time</div><div class="v">&lt; 2 <small>mins</small></div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Take the tour</h3>
+    <p style="color:var(--text);margin:0 0 14px">Each card below opens that part of the system. Read it like a stakeholder walkthrough — Apply → Dashboard → Pipeline → Driver Record → DHL Form → Portal — and see how a single driver's data flows through.</p>
+    <div class="tour-grid">
+      <div class="tour-card" data-go="apply"><div class="num">SCREEN 1 · DRIVER-FACING</div><h4>Public application form</h4><p>Multi-step form on baexpress.co.uk. Driver submits → Central Record created → pre-screen runs.</p></div>
+      <div class="tour-card" data-go="dashboard"><div class="num">SCREEN 2 · DIRECTOR</div><h4>Director Dashboard</h4><p>Live KPIs, pipeline funnel, action queue, lifecycle alerts. Your morning briefing.</p></div>
+      <div class="tour-card" data-go="pipeline"><div class="num">SCREEN 3 · DIRECTOR</div><h4>Pipeline view</h4><p>Every driver in the system, by stage. Click any row to see the full record.</p></div>
+      <div class="tour-card" data-go="record"><div class="num">SCREEN 4 · DIRECTOR</div><h4>Driver Single Record</h4><p>The Central Driver Record made visual. Tabbed sections, activity log, one-click DHL form.</p></div>
+      <div class="tour-card" data-go="dhl"><div class="num">SCREEN 5 · DIRECTOR + DHL</div><h4>DHL Vetting Form generator</h4><p>Auto-populated from the Central Record. 32+/35 fields filled. Submit when complete.</p></div>
+      <div class="tour-card" data-go="portal"><div class="num">SCREEN 6 · DRIVER-FACING</div><h4>Driver Portal</h4><p>Post-hire driver view — schedule, payslip, vehicle, lifecycle reminders, SOPs.</p></div>
+      <div class="tour-card" data-go="analytics"><div class="num">SCREEN 7 · DIRECTOR</div><h4>Analytics</h4><p>Funnel conversion, cycle time per stage, source-of-hire, weekly trends.</p></div>
+      <div class="tour-card" data-go="lifecycle"><div class="num">SCREEN 8 · COMPLIANCE</div><h4>Lifecycle calendar</h4><p>Upcoming DVLA, CRC, RTW, training renewals. Auto-scheduled reminders.</p></div>
+      <div class="tour-card" data-go="audit"><div class="num">SCREEN 9 · COMPLIANCE</div><h4>Audit pack export</h4><p>One-click PDF bundle for any driver — all docs, decisions, timestamps.</p></div>
+      <div class="tour-card" data-go="arch"><div class="num">UNDER THE HOOD</div><h4>Architecture &amp; data flow</h4><p>C4-style diagrams · system context · containers · components · sequences.</p></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3>The driver journey · 7-day happy path</h3>
+    <p style="color:var(--text);margin:0 0 14px">From "I want a job" to "first route" — what a successful applicant experiences, end to end.</p>
+    <div class="seqbox">
+<pre class="mermaid">
+journey
+    title Driver journey - apply to active in 7 days
+    section Day 1 Apply
+      Visits baexpress.co.uk: 5: Driver
+      Completes 5-step form: 4: Driver
+      Auto pre-screen passes: 5: System
+      Interview booking email: 5: System
+    section Day 2 Interview
+      Books slot via calendar link: 5: Driver
+      Interview held: 5: Director, Driver
+      Director signs suitability: 4: Director
+      Document request emailed: 5: System
+    section Day 3-4 Documents
+      Driver uploads docs via portal: 4: Driver
+      RTW and DVLA share-codes: 4: Driver
+      Auto-checks run overnight: 5: System
+    section Day 5 Vetting
+      Vetting officer reviews: 4: Vetting
+      UK CRC clear: 5: System
+      All references received: 4: System
+    section Day 5 DHL submit
+      DHL form auto-populates: 5: System
+      Director one-click submit: 5: Director
+      APHIDS reference attached: 5: System
+    section Day 6 DHL approval
+      DHL Service Partner approves: 5: DHL
+      Van assigned: 5: Operations
+    section Day 7 Active
+      E-signed contract: 5: Driver, Director
+      Van handover and training: 5: Operations
+      First route assigned: 5: Driver
+      Driver Portal goes live: 5: Driver
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ============= APPLY ============= -->
+<div class="screen" data-screen="apply">
+  <div class="page-title">
+    <div><h1>Apply Now</h1><p>What a driver sees on baexpress.co.uk/apply · multi-step, save &amp; resume, mobile-first</p></div>
+    <div class="actions"><button class="btn secondary" onclick="resetApply()">Restart</button></div>
+  </div>
+
+  <div class="applybg">
+    <div class="top">
+      <div class="logo">BA <span class="accent">EXPRESS</span></div>
+      <div style="font-size:11px;color:#C7CCD4">Saved automatically · resume anytime</div>
+    </div>
+    <div class="progresswrap">
+      <div class="progress" id="apProgress">
+        <div class="step done"></div>
+        <div class="step done"></div>
+        <div class="step active"></div>
+        <div class="step"></div>
+        <div class="step"></div>
+      </div>
+      <div class="pl" id="apLabels">
+        <div class="step done">Personal</div>
+        <div class="step done">Eligibility</div>
+        <div class="step active">Licence</div>
+        <div class="step">History</div>
+        <div class="step">Review</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="formarea" data-step="1" style="display:none">
+      <h3>Personal details</h3>
+      <p class="formsub">We'll use this to set up your driver record. Encrypted, GDPR-compliant.</p>
+      <div class="formrow2">
+        <div class="formfield"><label>First name</label><input value="Mitchell" /></div>
+        <div class="formfield"><label>Last name</label><input value="Sophie" /></div>
+      </div>
+      <div class="formrow2">
+        <div class="formfield"><label>Date of birth</label><input value="22 / 09 / 1995" /></div>
+        <div class="formfield"><label>National Insurance number</label><input value="JX 67 89 12 D" /></div>
+      </div>
+      <div class="formrow2">
+        <div class="formfield"><label>Email</label><input value="sophie.mitchell@email.com" /></div>
+        <div class="formfield"><label>Mobile number</label><input value="07700 900 193" /></div>
+      </div>
+      <div class="formrow3">
+        <div class="formfield"><label>Postcode</label><input value="UB7 0LP" /></div>
+        <div class="formfield"><label>Years at this address</label><input value="3" /></div>
+        <div class="formfield"><label>City</label><input value="West Drayton" /></div>
+      </div>
+      <div class="actionrow">
+        <button class="btn secondary" disabled>← Back</button>
+        <button class="btn primary" onclick="apStep(2)">Continue to eligibility →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="formarea" data-step="2" style="display:none">
+      <h3>Eligibility</h3>
+      <p class="formsub">Right to work and licence eligibility.</p>
+      <div class="formfield"><label>Right to work in the UK</label><select><option>British / Irish citizen</option><option>Settled / Pre-settled status</option><option>Visa with right to work</option><option>No right to work</option></select></div>
+      <div class="privacybox"><b>Why we ask:</b> we run a UK Government share-code check on all applicants. We can't take your application without right to work — by law.</div>
+      <div class="formfield"><label>RTW share code (skip if British / Irish)</label><input placeholder="e.g. AB12 CD34 EF" /></div>
+      <div class="actionrow">
+        <button class="btn secondary" onclick="apStep(1)">← Back</button>
+        <button class="btn primary" onclick="apStep(3)">Continue to licence →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 (default visible) -->
+    <div class="formarea" data-step="3">
+      <h3>Driving licence &amp; experience</h3>
+      <p class="formsub">We use this to run insurance and DVLA checks. All data is encrypted and only used for vetting.</p>
+      <div class="formrow2">
+        <div class="formfield"><label>Driving licence number</label><input value="MITCH950922SE7TT" /></div>
+        <div class="formfield"><label>Categories held</label><input value="B, B+E" /></div>
+      </div>
+      <div class="formrow2">
+        <div class="formfield"><label>Date licence held since</label><input value="14 / 03 / 2020" /></div>
+        <div class="formfield"><label>Driving experience (years)</label><input value="5" /></div>
+      </div>
+      <div class="helpbox">
+        <b>Heads up:</b> our fleet insurance prefers age 25+ and 1+ year of experience. If that's not you, we can still consider you with a higher excess — your application will <strong>not</strong> be auto-rejected.
+      </div>
+      <div class="formrow2">
+        <div class="formfield"><label>Points on licence</label><input value="0" /></div>
+        <div class="formfield"><label>Any DR / IN / DD codes?</label><select><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div class="formfield"><label>DVLA share code <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">(optional now — speeds things up)</span></label><input placeholder="e.g. AB12 CD34 EF" value="QW88 RT45 YU" /></div>
+      <div class="actionrow">
+        <button class="btn secondary" onclick="apStep(2)">← Back</button>
+        <button class="btn primary" onclick="apStep(4)">Continue to history →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="formarea" data-step="4" style="display:none">
+      <h3>5-year history</h3>
+      <p class="formsub">Tell us what you've been doing for the last 5 years. We need to account for every period — no unexplained gaps over 28 days. (DHL / CAA requirement.)</p>
+      <div style="background:var(--green2);border:1px solid #B5DCC4;padding:8px 12px;border-radius:5px;font-size:12px;color:var(--green);margin-bottom:12px"><b>5 years 0 months covered</b> · no gaps over 28 days · ready to continue</div>
+      <div class="card" style="border-left:3px solid var(--coral);margin-bottom:8px">
+        <div class="formrow3" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <div class="formfield"><label>Type</label><input value="Employment" /></div>
+          <div class="formfield"><label>Organisation</label><input value="Quick Couriers Ltd" /></div>
+          <div class="formfield"><label>From</label><input value="Mar 2023" /></div>
+          <div class="formfield"><label>To</label><input value="Today" /></div>
+        </div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--coral);margin-bottom:8px">
+        <div class="formrow3" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <div class="formfield"><label>Type</label><input value="Self-employed" /></div>
+          <div class="formfield"><label>Organisation</label><input value="Various delivery work" /></div>
+          <div class="formfield"><label>From</label><input value="Jun 2021" /></div>
+          <div class="formfield"><label>To</label><input value="Feb 2023" /></div>
+        </div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--coral);margin-bottom:8px">
+        <div class="formrow3" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <div class="formfield"><label>Type</label><input value="Employment" /></div>
+          <div class="formfield"><label>Organisation</label><input value="Tesco Distribution" /></div>
+          <div class="formfield"><label>From</label><input value="May 2020" /></div>
+          <div class="formfield"><label>To</label><input value="May 2021" /></div>
+        </div>
+      </div>
+      <button class="btn ghost">+ Add another period</button>
+      <div class="actionrow">
+        <button class="btn secondary" onclick="apStep(3)">← Back</button>
+        <button class="btn primary" onclick="apStep(5)">Continue to review →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="formarea" data-step="5" style="display:none">
+      <h3>Review &amp; submit</h3>
+      <p class="formsub">Final check. You can edit any answer by clicking it.</p>
+      <div class="card">
+        <div class="fg">
+          <div><div class="lbl">Name</div><div class="val">Sophie Mitchell</div></div>
+          <div><div class="lbl">DOB</div><div class="val">22 Sep 1995</div></div>
+          <div><div class="lbl">Right to work</div><div class="val green">British citizen</div></div>
+          <div><div class="lbl">Licence</div><div class="val">B, B+E · held 5 years · 0 points</div></div>
+          <div><div class="lbl">Address</div><div class="val">UB7 0LP · West Drayton</div></div>
+          <div><div class="lbl">Eligibility</div><div class="val green">Standard band — no insurance exception</div></div>
+        </div>
+      </div>
+      <div class="checkrow"><input type="checkbox" checked /><div>I confirm the above is accurate to the best of my knowledge. I understand that providing false information may result in rejection or termination.</div></div>
+      <div class="checkrow"><input type="checkbox" checked /><div>I consent to BA Express running vetting checks (RTW, sanctions, DVLA, criminal record) and sharing my data with DHL or other client carriers for their vetting requirements.</div></div>
+      <div class="actionrow">
+        <button class="btn secondary" onclick="apStep(4)">← Back</button>
+        <button class="btn primary" onclick="submitApply()">Submit application →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= DASHBOARD ============= -->
+<div class="screen" data-screen="dashboard">
+  <div class="page-title">
+    <div><h1>Director Dashboard</h1><p>Tuesday, 7 May 2026 · 09:14 · live data from the Central Driver Record</p></div>
+    <div class="actions">
+      <button class="btn secondary" onclick="openModal('Export dashboard','Exports the current dashboard view as a PDF snapshot. Useful for weekly stakeholder updates or compliance archives. In production: triggers Cowork pdf skill, files to Drive, and emails the Director.')">Export</button>
+      <button class="btn dark" data-go="pipeline">View full pipeline →</button>
+    </div>
+  </div>
+
+  <h2 style="margin:18px 0 10px;font-size:13px;color:var(--coral);text-transform:uppercase;letter-spacing:0.06em">This week</h2>
+  <div class="grid-5">
+    <div class="kpi"><div class="l">New applications</div><div class="v">12</div><div class="d up">↑ 3 vs last week</div></div>
+    <div class="kpi amber"><div class="l">In vetting</div><div class="v">7</div><div class="d">2 awaiting docs</div></div>
+    <div class="kpi coral"><div class="l">Awaiting DHL</div><div class="v">3</div><div class="d dn">1 overdue</div></div>
+    <div class="kpi green"><div class="l">Active this week</div><div class="v">2</div><div class="d up">↑ Sophie M, Adam B</div></div>
+    <div class="kpi"><div class="l">Apply → Active</div><div class="v">6.2<small>d</small></div><div class="d up">↑ 5d faster vs M-1</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card">
+      <h3>Pipeline funnel · last 30 days</h3>
+      <div class="funnel" style="border:none;padding:0">
+        <div class="funnel-row"><div class="lbl">Applications</div><div class="bar" style="width:100%">38</div><div class="pct">100%</div></div>
+        <div class="funnel-row"><div class="lbl">Pre-screen pass</div><div class="bar b2" style="width:84%">32</div><div class="pct">84%</div></div>
+        <div class="funnel-row"><div class="lbl">Interview pass</div><div class="bar b3" style="width:68%">26</div><div class="pct">68%</div></div>
+        <div class="funnel-row"><div class="lbl">Vetting pass</div><div class="bar b4" style="width:53%">20</div><div class="pct">53%</div></div>
+        <div class="funnel-row"><div class="lbl">DHL approved</div><div class="bar b5" style="width:47%">18</div><div class="pct">47%</div></div>
+        <div class="funnel-row"><div class="lbl">Active</div><div class="bar b6" style="width:42%">16</div><div class="pct">42%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>SLA performance · last 7 days</h3>
+      <div style="display:flex;align-items:center;gap:24px;margin-bottom:14px">
+        <div style="font-size:48px;font-weight:800;color:var(--green);line-height:1">94<span style="font-size:20px;color:var(--subtle)">%</span></div>
+        <div style="font-size:12px;color:var(--subtle);line-height:1.5">Stages hitting SLA<br/>Target ≥ 90% · last week 91%</div>
+      </div>
+      <div style="font-size:11px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Worst-performing stage</div>
+      <div style="background:var(--amber2);border:1px solid #F0DBA8;padding:10px 12px;border-radius:6px;font-size:12px;color:var(--navy)">
+        <b>DHL approval wait</b> — 3 of last 7 submissions over 5 days. <span class="pill amber">Action: chase DHL</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card">
+      <h3>Action queue · waiting on you</h3>
+      <div class="alert-strip"><span><b>OVERDUE</b> · DHL response on Khan, S — 8 days. Auto-chase sent D+3, D+5, D+7</span><span class="pill coral">Escalate</span></div>
+      <div class="queue-row" data-go="record"><div class="av c2">SJ</div><div><div class="name">Smith, Jay</div><div class="meta">Insurance exception decision · age 23, exp 1.5yr</div></div><span class="pill amber">Decide</span><div class="age">2h ago</div></div>
+      <div class="queue-row" data-go="record"><div class="av c1">RP</div><div><div class="name">Patel, Raj</div><div class="meta">Suitability declaration after interview</div></div><span class="pill amber">Decide</span><div class="age">1d ago</div></div>
+      <div class="queue-row" data-go="record"><div class="av c3">MO</div><div><div class="name">Okafor, Maria</div><div class="meta">VRA — gap explanation Jun-Aug 2024</div></div><span class="pill coral">Review</span><div class="age">3d ago</div></div>
+    </div>
+    <div class="card">
+      <h3>Lifecycle alerts · upcoming</h3>
+      <div class="queue-row" data-go="lifecycle"><div class="av c1">DL</div><div><div class="name">Lewis, Daniel</div><div class="meta">DVLA recheck due in 14 days</div></div><span class="pill amber">Schedule</span><div class="age">14d</div></div>
+      <div class="queue-row" data-go="lifecycle"><div class="av c4">AB</div><div><div class="name">Bennett, Adam</div><div class="meta">CRC refresh in 28 days</div></div><span class="pill amber">Schedule</span><div class="age">28d</div></div>
+      <div class="queue-row" data-go="lifecycle"><div class="av c5">SK</div><div><div class="name">Khan, Sara</div><div class="meta">Training refresh due</div></div><span class="pill amber">Schedule</span><div class="age">7d</div></div>
+      <div class="queue-row" data-go="lifecycle"><div class="av c2">YH</div><div><div class="name">Hassan, Yusuf</div><div class="meta">RTW share-code expires</div></div><span class="pill">60d</span><div class="age"></div></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card">
+      <h3>Recent activity</h3>
+      <div class="act"><div class="when">Today 09:02</div><b>System</b> · DHL chase email sent (3rd) for Khan, S</div>
+      <div class="act"><div class="when">Today 08:47</div><b>Driver</b> Mitchell, S submitted application (auto pre-screen passed)</div>
+      <div class="act"><div class="when">Today 08:00</div><b>System</b> · Daily SLA scan — 1 overdue, 3 action items, 4 lifecycle alerts</div>
+      <div class="act"><div class="when">Yesterday 17:22</div><b>Director</b> · Suitability signed off for Brown, E</div>
+      <div class="act"><div class="when">Yesterday 14:08</div><b>Vetting</b> · UK CRC clear for Kowalski, P</div>
+      <div class="act"><div class="when">Yesterday 11:30</div><b>DHL</b> · Approval received for Bennett, A</div>
+    </div>
+    <div class="card">
+      <h3>Active drivers · summary</h3>
+      <table>
+        <thead><tr><th>Driver</th><th>Client / Route</th><th>Started</th><th></th></tr></thead>
+        <tbody>
+          <tr class="clickable" data-go="record"><td><span class="av c1">RP</span> Patel, Raj</td><td>DHL · HRW-12</td><td>2 weeks ago</td><td><span class="pill green">Active</span></td></tr>
+          <tr class="clickable" data-go="record"><td><span class="av c4">AB</span> Bennett, Adam</td><td>DHL · STN-04</td><td>3 weeks ago</td><td><span class="pill green">Active</span></td></tr>
+          <tr class="clickable" data-go="record"><td><span class="av c1">DL</span> Lewis, Daniel</td><td>DHL · HRW-08</td><td>2 months ago</td><td><span class="pill green">Active</span></td></tr>
+          <tr class="clickable" data-go="record"><td><span class="av c2">YH</span> Hassan, Yusuf</td><td>DHL · LGW-02</td><td>4 months ago</td><td><span class="pill green">Active</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============= PIPELINE ============= -->
+<div class="screen" data-screen="pipeline">
+  <div class="page-title">
+    <div><h1>Pipeline</h1><p>Every driver in the system, by stage · click any row to open the record</p></div>
+    <div class="actions">
+      <button class="btn secondary" onclick="openModal('Filter pipeline','Filter by stage, client, source, SLA status, days in stage. Saved filters appear as quick-access tabs. Common: \'Awaiting me\', \'Overdue\', \'New this week\'.')">Filter</button>
+      <button class="btn secondary" onclick="openModal('Export CSV','Exports the current visible rows to CSV with all columns. Useful for ad-hoc analysis, sharing with the accountant, or DHL audit responses. Generated by Cowork from the live Notion data.')">Export CSV</button>
+      <button class="btn primary" data-go="apply">+ Add applicant</button>
+    </div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead>
+        <tr>
+          <th>Driver</th><th>ID</th><th>Stage</th><th>Days in stage</th><th>SLA</th><th>Client</th><th>Source</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c1">RP</span> Patel, Raj</td><td><code>D-2026-0184</code></td>
+          <td><span class="pill amber">Suitability</span></td><td>1d</td>
+          <td><span class="pill green">On SLA</span></td><td>DHL</td><td>Web form</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c2">SJ</span> Smith, Jay</td><td><code>D-2026-0192</code></td>
+          <td><span class="pill amber">Insurance Exception</span></td><td>2h</td>
+          <td><span class="pill green">On SLA</span></td><td>DHL (TBC)</td><td>Web form</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c5">SK</span> Khan, Sara</td><td><code>D-2026-0188</code></td>
+          <td><span class="pill blue">DHL Pending</span></td><td>8d</td>
+          <td><span class="pill coral">Overdue</span></td><td>DHL</td><td>Referral</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c3">MO</span> Okafor, Maria</td><td><code>D-2026-0190</code></td>
+          <td><span class="pill amber">VRA Review</span></td><td>3d</td>
+          <td><span class="pill amber">At-risk</span></td><td>DHL (TBC)</td><td>Indeed</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c4">EB</span> Brown, Emma</td><td><code>D-2026-0191</code></td>
+          <td><span class="pill">Vetting</span></td><td>2d</td>
+          <td><span class="pill green">On SLA</span></td><td>DHL (TBC)</td><td>Web form</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c2">PK</span> Kowalski, Piotr</td><td><code>D-2026-0189</code></td>
+          <td><span class="pill">Vetting</span></td><td>4d</td>
+          <td><span class="pill green">On SLA</span></td><td>DHL (TBC)</td><td>Indeed</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c3">SM</span> Mitchell, Sophie</td><td><code>D-2026-0193</code></td>
+          <td><span class="pill">Pre-screen Passed</span></td><td>1h</td>
+          <td><span class="pill green">On SLA</span></td><td>DHL (TBC)</td><td>Web form</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c1">DL</span> Lewis, Daniel</td><td><code>D-2026-0186</code></td>
+          <td><span class="pill green">Active</span></td><td>61d</td>
+          <td>—</td><td>DHL · HRW-08</td><td>Referral</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c4">AB</span> Bennett, Adam</td><td><code>D-2026-0185</code></td>
+          <td><span class="pill green">Active</span></td><td>23d</td>
+          <td>—</td><td>DHL · STN-04</td><td>Web form</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+        <tr class="clickable" data-go="record">
+          <td><span class="av c2">YH</span> Hassan, Yusuf</td><td><code>D-2026-0187</code></td>
+          <td><span class="pill green">Active</span></td><td>120d</td>
+          <td>—</td><td>DHL · LGW-02</td><td>Referral</td><td><button class="btn sm secondary">View</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--subtle);margin-top:10px">
+    <div>Showing 10 of 38 records · last 30 days</div>
+    <div>Updated live from Notion · <a onclick="alert('Refreshed live data')">Refresh</a></div>
+  </div>
+</div>
+
+<!-- ============= DRIVER RECORD ============= -->
+<div class="screen" data-screen="record">
+  <div class="page-title">
+    <div><h1>Patel, Raj <span style="color:var(--subtle);font-weight:400">· D-2026-0184</span></h1><p>Single Driver Record · the Central Record made visual</p></div>
+    <div class="actions">
+      <button class="btn secondary" data-go="pipeline">← Back to pipeline</button>
+      <button class="btn dark" data-go="dhl">Generate DHL form →</button>
+    </div>
+  </div>
+
+  <div class="rec-grid">
+    <!-- LEFT RAIL -->
+    <div class="rec-left">
+      <div class="name">Patel, Raj</div>
+      <div class="id">D-2026-0184</div>
+      <div class="stage-list">
+        <div class="stage-item done"><span class="check"></span>Application</div>
+        <div class="stage-item done"><span class="check"></span>Pre-screen</div>
+        <div class="stage-item done"><span class="check"></span>Interview</div>
+        <div class="stage-item active"><span class="check"></span>Suitability</div>
+        <div class="stage-item"><span class="check"></span>Documents</div>
+        <div class="stage-item"><span class="check"></span>Vetting checks</div>
+        <div class="stage-item"><span class="check"></span>DHL submission</div>
+        <div class="stage-item"><span class="check"></span>Van handover</div>
+        <div class="stage-item"><span class="check"></span>Training</div>
+        <div class="stage-item"><span class="check"></span>Active</div>
+      </div>
+      <div class="quick">
+        <h6>Quick actions</h6>
+        <button onclick="openModal('Sign suitability declaration','Mark Patel, R as Suitable based on interview held on 6 May. This will be logged to the activity trail and trigger the document request to the driver.')">Sign suitability ✓</button>
+        <button data-go="dhl">Generate DHL form</button>
+        <button onclick="openModal('Send chase email','Draft chase email to driver about outstanding documents. Cowork will use the BA Express tone of voice.')">Email driver</button>
+        <button onclick="openModal('Audit pack','Generates a single PDF with all documents, decisions, vetting evidence, activity log and DHL form for this driver. Ready in ~10 seconds.')">Export audit pack</button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="rec-main">
+      <div class="rec-tabs" id="recTabs">
+        <div class="rec-tab active" data-tab="personal">Personal</div>
+        <div class="rec-tab" data-tab="licence">Licence</div>
+        <div class="rec-tab" data-tab="history">History</div>
+        <div class="rec-tab" data-tab="documents">Documents</div>
+        <div class="rec-tab" data-tab="vetting">Vetting</div>
+        <div class="rec-tab" data-tab="dhl">DHL</div>
+        <div class="rec-tab" data-tab="ops">Operational</div>
+      </div>
+
+      <div class="rec-panel active" data-panel="personal">
+        <h4>Personal &amp; contact</h4>
+        <div class="fg">
+          <div><div class="lbl">Full name</div><div class="val">Raj Patel</div></div>
+          <div><div class="lbl">Date of birth</div><div class="val">14 / 06 / 1992 · 33 yrs</div></div>
+          <div><div class="lbl">National Insurance</div><div class="val">JX 12 34 56 D</div></div>
+          <div><div class="lbl">Postcode</div><div class="val">UB3 4LP · Hayes</div></div>
+          <div><div class="lbl">Email</div><div class="val">raj.patel@email.com</div></div>
+          <div><div class="lbl">Phone</div><div class="val">07700 900 184</div></div>
+          <div><div class="lbl">Years at address</div><div class="val">7 yrs</div></div>
+          <div><div class="lbl">Source</div><div class="val">Web form · 4 May</div></div>
+        </div>
+      </div>
+      <div class="rec-panel active" data-panel="personal">
+        <h4>Eligibility flags</h4>
+        <div class="fg">
+          <div><div class="lbl">Right to work</div><div class="val green">✓ Verified · share code AB12CD34</div></div>
+          <div><div class="lbl">Age check</div><div class="val green">✓ 33 · within standard band</div></div>
+          <div><div class="lbl">Experience</div><div class="val green">✓ 4 years · within standard</div></div>
+          <div><div class="lbl">Insurance exception</div><div class="val">Not required</div></div>
+        </div>
+      </div>
+
+      <div class="rec-panel" data-panel="licence">
+        <h4>Driving licence &amp; DVLA</h4>
+        <div class="fg">
+          <div><div class="lbl">Licence number</div><div class="val">PATEL920614R29JD</div></div>
+          <div><div class="lbl">Categories</div><div class="val">B, B+E</div></div>
+          <div><div class="lbl">Held since</div><div class="val">12 / 03 / 2021 · 5 yrs</div></div>
+          <div><div class="lbl">Points</div><div class="val">3 · SP30</div></div>
+          <div><div class="lbl">Endorsements</div><div class="val">SP30 (Mar 2024)</div></div>
+          <div><div class="lbl">DVLA share code</div><div class="val">QW88 RT45 YU</div></div>
+          <div><div class="lbl">DVLA check</div><div class="val green">✓ Clean · 06 May 2026</div></div>
+          <div><div class="lbl">Next DVLA recheck</div><div class="val">06 / 05 / 2027</div></div>
+        </div>
+      </div>
+
+      <div class="rec-panel" data-panel="history">
+        <h4>5-year history</h4>
+        <div class="fg" style="grid-template-columns:1fr">
+          <div><div class="lbl">2023 · Mar — present</div><div class="val">Employment · Quick Couriers Ltd · Driver <span class="pill green">Reference verified</span></div></div>
+          <div><div class="lbl">2021 · Jun — 2023 · Feb</div><div class="val">Self-employed · Various delivery work <span class="pill green">HMRC SA evidence on file</span></div></div>
+          <div><div class="lbl">2020 · May — 2021 · May</div><div class="val">Employment · Tesco Distribution · Warehouse op <span class="pill green">Reference verified</span></div></div>
+        </div>
+        <div style="margin-top:14px;background:var(--green2);padding:8px 12px;border-radius:5px;font-size:12px;color:var(--green);border-left:3px solid var(--green)">✓ <b>5 years 0 months covered</b> · no gaps over 28 days · all references received</div>
+      </div>
+
+      <div class="rec-panel" data-panel="documents">
+        <h4>Documents on file</h4>
+        <div class="doc-row"><b>Photo ID · Passport</b><span class="pill green">Verified</span></div>
+        <div class="doc-row"><b>Right to work evidence</b><span class="pill green">Verified · share code</span></div>
+        <div class="doc-row"><b>Proof of address</b><span class="pill green">Council tax · 12 Apr</span></div>
+        <div class="doc-row"><b>Driving licence photo</b><span class="pill green">Verified</span></div>
+        <div class="doc-row"><b>UK CRC (DBS basic)</b><span class="pill amber">Awaiting result</span></div>
+        <div class="doc-row"><b>Reference 1 · Quick Couriers</b><span class="pill green">Received</span></div>
+        <div class="doc-row"><b>Reference 2 · Tesco</b><span class="pill amber">Sent · awaiting</span></div>
+      </div>
+
+      <div class="rec-panel" data-panel="vetting">
+        <h4>Vetting checks</h4>
+        <div class="fg">
+          <div><div class="lbl">ID verification</div><div class="val green">✓ Verified · 06 May</div></div>
+          <div><div class="lbl">RTW</div><div class="val green">✓ Verified · 06 May</div></div>
+          <div><div class="lbl">Sanctions screen</div><div class="val green">✓ Clear · 06 May</div></div>
+          <div><div class="lbl">DVLA</div><div class="val green">✓ Clean · 06 May</div></div>
+          <div><div class="lbl">UK CRC</div><div class="val amber">⏳ Pending · ord. 05 May</div></div>
+          <div><div class="lbl">International CRC</div><div class="val">Not required</div></div>
+          <div><div class="lbl">VRA required</div><div class="val">No</div></div>
+          <div><div class="lbl">5-yr history</div><div class="val green">✓ Complete</div></div>
+        </div>
+      </div>
+
+      <div class="rec-panel" data-panel="dhl">
+        <h4>DHL submission</h4>
+        <div class="fg">
+          <div><div class="lbl">Client</div><div class="val">DHL Heathrow</div></div>
+          <div><div class="lbl">Form generated</div><div class="val amber">Not yet · 32/35 fields ready</div></div>
+          <div><div class="lbl">APHIDS reference</div><div class="val">—</div></div>
+          <div><div class="lbl">Submission status</div><div class="val">Not submitted</div></div>
+          <div><div class="lbl">Approval</div><div class="val">Pending submission</div></div>
+        </div>
+        <div style="margin-top:14px;text-align:right">
+          <button class="btn primary" data-go="dhl">Generate &amp; submit to DHL →</button>
+        </div>
+      </div>
+
+      <div class="rec-panel" data-panel="ops">
+        <h4>Operational (after activation)</h4>
+        <div class="fg">
+          <div><div class="lbl">Van assigned</div><div class="val">— (after DHL approval)</div></div>
+          <div><div class="lbl">Hire contract</div><div class="val">— pending</div></div>
+          <div><div class="lbl">Deductions agreement</div><div class="val">— pending</div></div>
+          <div><div class="lbl">Payment rate</div><div class="val">£0.85 / stop · standard</div></div>
+          <div><div class="lbl">Start date</div><div class="val">Provisional · 19 May 2026</div></div>
+          <div><div class="lbl">Route</div><div class="val">DHL · HRW-15 (provisional)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT RAIL -->
+    <div class="rec-right">
+      <h5>Activity log</h5>
+      <div class="act"><div class="when">Today 14:22</div><b>System</b> · Awaiting suitability decision (SLA: same day)</div>
+      <div class="act"><div class="when">Today 11:08</div><b>Director</b> · Interview notes saved</div>
+      <div class="act"><div class="when">Today 09:34</div><b>System</b> · DVLA check returned clean · 3 pts SP30</div>
+      <div class="act"><div class="when">06 May 16:30</div><b>Director</b> · Interview held · scored "Meets"</div>
+      <div class="act"><div class="when">05 May 18:00</div><b>System</b> · References sent</div>
+      <div class="act"><div class="when">05 May 09:15</div><b>System</b> · Pre-screen passed · all standard band</div>
+      <div class="act"><div class="when">04 May 18:42</div><b>Driver</b> · Application submitted</div>
+      <h5 style="margin-top:18px">SLA tracker</h5>
+      <div style="font-size:11px;color:var(--subtle);margin-bottom:6px">Current stage: Suitability</div>
+      <div style="background:#F2F4F7;border-radius:6px;padding:10px;font-size:12px"><b>Deadline:</b> Today 19:00 · <span class="pill green">on track</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= DHL FORM ============= -->
+<div class="screen" data-screen="dhl">
+  <div class="page-title">
+    <div><h1>DHL Vetting Form · Patel, Raj</h1><p>Auto-populated from the Central Driver Record · 32 of 35 fields ready</p></div>
+    <div class="actions">
+      <button class="btn secondary" data-go="record">← Back to record</button>
+      <button class="btn secondary" onclick="openModal('Preview','This would open a Word document preview of the populated DHL Vetting Form, showing exactly what DHL will receive.')">Preview .docx</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How DHL submission works · sequence</h3>
+    <p style="color:var(--subtle);margin:0 0 12px">What happens between "click Submit" and "DHL approves". Every step is logged on the activity trail.</p>
+    <div class="seqbox">
+<pre class="mermaid">
+sequenceDiagram
+    actor Director as Thiago Director
+    participant CDR as Central Record Notion
+    participant Cowork as Cowork docx skill
+    participant Make as Make workflow
+    participant Email as Gmail
+    participant DHL as DHL Service Partner
+    participant APHIDS as APHIDS
+
+    Director->>CDR: Click Generate and submit
+    CDR->>Cowork: Pull all 35 fields
+    Cowork->>Cowork: Run completeness check
+    alt All required fields green
+        Cowork->>Cowork: Generate DHL form docx
+        Cowork->>Make: Form ready trigger
+        Make->>APHIDS: Submit APHIDS record
+        APHIDS-->>Make: Reference number
+        Make->>Email: Email DHL with form
+        Email->>DHL: Form delivered
+        Make->>CDR: Update state to DHL Pending
+        Make->>CDR: Schedule chase D+3
+        Make->>CDR: Append activity log
+        CDR-->>Director: Confirmation in dashboard
+        DHL->>Email: Approval D+1 to D+5
+        Email->>Make: Parse approval
+        Make->>CDR: Update to DHL Approved
+        CDR-->>Director: Ready for van handover
+    else Missing fields
+        Cowork-->>Director: Show missing fields, submit locked
+    end
+</pre>
+    </div>
+  </div>
+
+  <div class="dhlbg">
+    <div class="head"><h3>DHL Express Vetting Form</h3><span class="pill blue">Auto-populated · 32/35 fields · 91% complete</span></div>
+    <div class="fillban"><span><b>32 of 35 fields auto-filled</b> from the Central Driver Record. <b>3 fields</b> need attention before submission.</span><span class="pill green">91%</span></div>
+
+    <div class="fsec">
+      <h4>1 · Identity &amp; contact</h4>
+      <div class="row">
+        <div><div class="lbl">Full name</div><div class="val">Raj Patel <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Date of birth</div><div class="val">14 / 06 / 1992 <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Address</div><div class="val">14 Linden Way, Hayes UB3 4LP <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Photo ID</div><div class="val">Passport · uploaded 06 May <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">National Insurance</div><div class="val">JX 12 34 56 D <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Years at address</div><div class="val">7 years <span class="src">FROM CDR</span></div></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <h4>2 · Right to work &amp; sanctions</h4>
+      <div class="row">
+        <div><div class="lbl">RTW status</div><div class="val">British citizen <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">RTW share code verified</div><div class="val">AB12CD34 · 06 May <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Sanctions screen</div><div class="val">Clear · 06 May 2026 <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Sanctions provider</div><div class="val">Worldcheck <span class="src">FROM CDR</span></div></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <h4>3 · Driving licence &amp; DVLA</h4>
+      <div class="row">
+        <div><div class="lbl">Licence number</div><div class="val">PATEL920614R29JD <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Categories</div><div class="val">B, B+E <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Held since</div><div class="val">12 / 03 / 2021 <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">DVLA check</div><div class="val">Clean · 3 pts SP30 · 06 May <span class="src">FROM CDR</span></div></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <h4>4 · 5-year history &amp; references</h4>
+      <div class="row">
+        <div><div class="lbl">5-yr history complete</div><div class="val">✓ Yes · no gaps &gt; 28 days <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">References received</div><div class="val miss">⚠ 1 of 2 · awaiting Tesco <span class="src">NEEDS ACTION</span></div></div>
+        <div><div class="lbl">HMRC evidence</div><div class="val">Self-employed period · on file <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">UK CRC (DBS)</div><div class="val miss">⚠ Pending · ord. 05 May <span class="src">NEEDS ACTION</span></div></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <h4>5 · Interview &amp; suitability</h4>
+      <div class="row">
+        <div><div class="lbl">Interview held</div><div class="val">06 May 2026 · Director <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Abilities &amp; aptitudes</div><div class="val">Meets <span class="src">FROM CDR</span></div></div>
+        <div><div class="lbl">Suitability declaration</div><div class="val miss">⚠ Pending Director sign-off <span class="src">NEEDS ACTION</span></div></div>
+        <div><div class="lbl">Interviewer</div><div class="val">Thiago (Director) <span class="src">FROM CDR</span></div></div>
+      </div>
+    </div>
+
+    <div class="subc">
+      <div class="info">
+        <span class="lbl">When ready, this form is generated as a Word doc and emailed to DHL with APHIDS reference</span>
+        <span>3 fields outstanding · cannot submit until cleared</span>
+      </div>
+      <button class="btn primary disabled" onclick="openModal('Cannot submit','3 fields still need action: 2nd reference, UK CRC result, Suitability sign-off. The button unlocks the moment they go green.')">Submit to DHL ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============= DRIVER PORTAL ============= -->
+<div class="screen" data-screen="portal">
+  <div class="page-title">
+    <div><h1>Driver Portal</h1><p>What an active driver sees · drivers.baexpress.co.uk · mobile-responsive</p></div>
+    <div class="actions">
+      <button class="btn secondary toggle-on" onclick="setPortalView('desktop',this)">View as desktop</button>
+      <button class="btn secondary" onclick="setPortalView('mobile',this)">View as mobile</button>
+    </div>
+  </div>
+
+  <div class="portal" id="driverPortal">
+    <div class="top">
+      <div class="logo" style="font-weight:800;font-size:14px">BA <span style="color:var(--coral)">EXPRESS</span> · Driver Portal</div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:white"><div class="av c1">RP</div>Raj Patel · Driver since 24 Apr</div>
+    </div>
+    <div class="body">
+      <div>
+        <h3>This week's schedule</h3>
+        <div class="sched">
+          <div class="day today"><div class="d">Today · Tue 7</div><div class="r">DHL Heathrow · Route HRW-12 · Start 06:30 · ~85 stops</div><div class="b">Confirmed</div></div>
+          <div class="day"><div class="d">Wed · 8</div><div class="r">DHL Heathrow · Route HRW-12 · Start 06:30</div><div class="b">Confirmed</div></div>
+          <div class="day"><div class="d">Thu · 9</div><div class="r">DHL Heathrow · Route HRW-08 · Start 07:00 · cover</div><div class="b">Confirmed</div></div>
+          <div class="day"><div class="d">Fri · 10</div><div class="r">DHL Heathrow · Route HRW-12 · Start 06:30</div><div class="b">Confirmed</div></div>
+          <div class="day"><div class="d">Sat · 11</div><div class="r">Day off</div><div class="b off">Off</div></div>
+          <div class="day"><div class="d">Sun · 12</div><div class="r">Day off</div><div class="b off">Off</div></div>
+          <div class="day"><div class="d">Mon · 13</div><div class="r">DHL Heathrow · Route HRW-15 · Start 07:30</div><div class="b">Confirmed</div></div>
+        </div>
+        <h3 style="margin-top:18px">Documents &amp; SOPs</h3>
+        <div class="card" style="margin-bottom:0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+            <a onclick="alert('Opens Driver Handbook')" style="display:block;padding:10px 12px;background:#F8FAFC;border:1px solid var(--line);border-radius:6px"><b>Driver Handbook</b><br/><span style="color:var(--subtle);font-size:11px">PDF · v3 · updated 12 Apr</span></a>
+            <a onclick="alert('Opens Vehicle Defect Form')" style="display:block;padding:10px 12px;background:#F8FAFC;border:1px solid var(--line);border-radius:6px"><b>Vehicle defect form</b><br/><span style="color:var(--subtle);font-size:11px">Submit if you spot anything</span></a>
+            <a onclick="alert('Opens Holiday Request')" style="display:block;padding:10px 12px;background:#F8FAFC;border:1px solid var(--line);border-radius:6px"><b>Holiday request</b><br/><span style="color:var(--subtle);font-size:11px">7+ days notice please</span></a>
+            <a onclick="alert('Opens Contact Ops')" style="display:block;padding:10px 12px;background:#F8FAFC;border:1px solid var(--line);border-radius:6px"><b>Contact operations</b><br/><span style="color:var(--subtle);font-size:11px">07700 900 000</span></a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>At a glance</h3>
+        <div class="tile">
+          <h5>Latest payslip</h5>
+          <div class="big">£1,847</div>
+          <div class="meta">Week ending 03 May · <a onclick="alert('Opens payslip PDF')">view PDF</a></div>
+        </div>
+        <div class="tile">
+          <h5>Your van</h5>
+          <div class="big" style="font-size:18px">LK24 PWZ</div>
+          <div class="meta">Mercedes Sprinter · MOT due 18 Sep · <a onclick="alert('Vehicle details opens')">vehicle details</a></div>
+        </div>
+        <div class="tile warn">
+          <h5>Action needed</h5>
+          <div class="big">DVLA recheck due</div>
+          <div class="meta">In 14 days · share new code</div>
+          <button class="btn sm primary" style="margin-top:8px" onclick="openModal('Submit DVLA share code','Driver enters their new DVLA share code here. System verifies via gov.uk DVLA, updates record, resets next-due date.')">Submit share code →</button>
+        </div>
+        <div class="tile">
+          <h5>Your stats · this month</h5>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+            <div><div style="font-size:18px;font-weight:800;color:var(--navy)">2,142</div><div style="color:var(--subtle)">Stops</div></div>
+            <div><div style="font-size:18px;font-weight:800;color:var(--navy)">98<span style="font-size:13px">%</span></div><div style="color:var(--subtle)">Completion</div></div>
+            <div><div style="font-size:18px;font-weight:800;color:var(--navy)">0</div><div style="color:var(--subtle)">Defects</div></div>
+            <div><div style="font-size:18px;font-weight:800;color:var(--green)">£3,894</div><div style="color:var(--subtle)">Earned</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= ANALYTICS ============= -->
+<div class="screen" data-screen="analytics">
+  <div class="page-title">
+    <div><h1>Analytics</h1><p>Funnel, cycle time, source-of-hire, weekly trends · last 30 days</p></div>
+    <div class="actions" id="periodToggle">
+      <button class="btn secondary" onclick="setPeriod('7d',this)">Last 7 days</button>
+      <button class="btn secondary toggle-on" onclick="setPeriod('30d',this)">Last 30 days</button>
+      <button class="btn secondary" onclick="setPeriod('ytd',this)">YTD</button>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="kpi"><div class="l">Applications</div><div class="v">38</div><div class="d up">↑ 22% vs prior 30d</div></div>
+    <div class="kpi green"><div class="l">Active activations</div><div class="v">16</div><div class="d up">↑ 6 vs prior 30d</div></div>
+    <div class="kpi amber"><div class="l">Median cycle time</div><div class="v">5.8<small>d</small></div><div class="d up">↓ 19 days vs Jan</div></div>
+    <div class="kpi coral"><div class="l">Cost per active</div><div class="v">£412</div><div class="d up">↓ £680 vs old process</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="chartbox">
+      <h3>Funnel · last 30 days</h3>
+      <div class="sub">Conversion at each stage. The drop-off in DHL approval is the biggest leakage.</div>
+      <div class="funnel" style="border:none;padding:0">
+        <div class="funnel-row"><div class="lbl">Applications</div><div class="bar" style="width:100%">38</div><div class="pct">100%</div></div>
+        <div class="funnel-row"><div class="lbl">Pre-screen pass</div><div class="bar b2" style="width:84%">32</div><div class="pct">84%</div></div>
+        <div class="funnel-row"><div class="lbl">Interview pass</div><div class="bar b3" style="width:68%">26</div><div class="pct">68%</div></div>
+        <div class="funnel-row"><div class="lbl">Vetting pass</div><div class="bar b4" style="width:53%">20</div><div class="pct">53%</div></div>
+        <div class="funnel-row"><div class="lbl">DHL approved</div><div class="bar b5" style="width:47%">18</div><div class="pct">47%</div></div>
+        <div class="funnel-row"><div class="lbl">Active</div><div class="bar b6" style="width:42%">16</div><div class="pct">42%</div></div>
+      </div>
+    </div>
+
+    <div class="chartbox">
+      <h3>Cycle time per stage · median days</h3>
+      <div class="sub">Where time goes. DHL approval is externally driven; everything else is on us.</div>
+      <div class="bar-chart" style="margin-top:30px;margin-bottom:30px">
+        <div class="bar" style="height:8%"><span class="label">0.04</span><span class="x">Pre-screen</span></div>
+        <div class="bar" style="height:35%"><span class="label">1.5</span><span class="x">Exception</span></div>
+        <div class="bar" style="height:25%"><span class="label">1.0</span><span class="x">Interview</span></div>
+        <div class="bar" style="height:55%"><span class="label">2.2</span><span class="x">Documents</span></div>
+        <div class="bar" style="height:75%"><span class="label">3.0</span><span class="x">Vetting</span></div>
+        <div class="bar" style="height:90%"><span class="label">3.6</span><span class="x">DHL wait</span></div>
+        <div class="bar" style="height:35%"><span class="label">1.5</span><span class="x">Van/train</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="chartbox">
+      <h3>Source of hire</h3>
+      <div class="sub">Where active drivers come from.</div>
+      <table style="margin-top:10px">
+        <thead><tr><th>Source</th><th>Applied</th><th>Active</th><th>Conv.</th></tr></thead>
+        <tbody>
+          <tr><td><b>Web form</b></td><td>22</td><td>11</td><td><span class="pill green">50%</span></td></tr>
+          <tr><td><b>Referral</b></td><td>9</td><td>4</td><td><span class="pill green">44%</span></td></tr>
+          <tr><td><b>Indeed</b></td><td>5</td><td>1</td><td><span class="pill amber">20%</span></td></tr>
+          <tr><td><b>Walk-in / phone</b></td><td>2</td><td>0</td><td><span class="pill coral">0%</span></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:12px;color:var(--subtle)"><b>Insight:</b> referrals and web form convert at &gt;40%. Indeed is paid acquisition with low conversion — review keyword spend.</div>
+    </div>
+
+    <div class="chartbox">
+      <h3>Weekly active activations · last 12 weeks</h3>
+      <div class="sub">Trend after launching the new system in week 5.</div>
+      <div class="bar-chart" style="margin-top:30px;margin-bottom:30px">
+        <div class="bar" style="height:25%;background:#9CA3AF"><span class="x">W1</span></div>
+        <div class="bar" style="height:30%;background:#9CA3AF"><span class="x">W2</span></div>
+        <div class="bar" style="height:20%;background:#9CA3AF"><span class="x">W3</span></div>
+        <div class="bar" style="height:35%;background:#9CA3AF"><span class="x">W4</span></div>
+        <div class="bar" style="height:35%"><span class="x">W5</span></div>
+        <div class="bar" style="height:50%"><span class="x">W6</span></div>
+        <div class="bar" style="height:65%"><span class="x">W7</span></div>
+        <div class="bar" style="height:60%"><span class="x">W8</span></div>
+        <div class="bar" style="height:75%"><span class="x">W9</span></div>
+        <div class="bar" style="height:85%"><span class="x">W10</span></div>
+        <div class="bar" style="height:90%"><span class="x">W11</span></div>
+        <div class="bar" style="height:100%"><span class="label">5</span><span class="x">W12</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--subtle)"><b>Grey bars:</b> old process. <b>Coral:</b> new DOS. Activation rate up 2.5× since launch.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= LIFECYCLE ============= -->
+<div class="screen" data-screen="lifecycle">
+  <div class="page-title">
+    <div><h1>Lifecycle calendar</h1><p>Auto-scheduled renewals · DVLA, CRC, RTW, training · D-30, D-7, D-0 reminders</p></div>
+    <div class="actions" id="lifecycleToggle">
+      <button class="btn secondary" onclick="setLifecycleView('cal',this)">Gantt view</button>
+      <button class="btn secondary toggle-on" onclick="setLifecycleView('list',this)">List view</button>
+    </div>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:14px">
+    <div class="kpi"><div class="l">Active drivers</div><div class="v">16</div><div class="d">In compliance loop</div></div>
+    <div class="kpi amber"><div class="l">Due in 30 days</div><div class="v">4</div><div class="d">DVLA × 2 · CRC · Training</div></div>
+    <div class="kpi green"><div class="l">Compliance %</div><div class="v">100<small>%</small></div><div class="d up">No expired credentials</div></div>
+    <div class="kpi"><div class="l">Avg renewal time</div><div class="v">3.1<small>d</small></div><div class="d">Driver to upload</div></div>
+  </div>
+
+  <div class="card" id="lifecycleGantt" style="display:none">
+    <h3>Gantt · next 60 days</h3>
+    <p style="color:var(--subtle);margin:0 0 14px">When each renewal needs action. Bar length = window between D-30 reminder and D-0 deadline.</p>
+    <div class="gantt">
+      <div class="head">
+        <div class="lbl">Driver · event</div>
+        <div class="w">Today</div><div class="w">+7d</div><div class="w">+14d</div><div class="w">+21d</div><div class="w">+28d</div><div class="w">+35d</div><div class="w">+45d</div><div class="w">+60d</div>
+      </div>
+      <div class="grow"><div class="lbl">Khan, Sara<small>Training refresh</small></div><div class="bar training" style="grid-column:2 / span 1">D-7 · 14 May</div></div>
+      <div class="grow"><div class="lbl">Lewis, Daniel<small>DVLA recheck</small></div><div class="bar dvla" style="grid-column:2 / span 2">D-14 · 21 May</div></div>
+      <div class="grow"><div class="lbl">Bennett, Adam<small>CRC refresh (3-yr)</small></div><div class="bar crc" style="grid-column:2 / span 4">D-28 · 4 Jun</div></div>
+      <div class="grow"><div class="lbl">Hassan, Yusuf<small>RTW expiry (visa)</small></div><div class="bar rtw" style="grid-column:7 / span 2">D-60 · 6 Jul</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:14px;flex-wrap:wrap;font-size:11px">
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:14px;height:14px;background:var(--green);border-radius:3px;display:inline-block"></i>Training</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:14px;height:14px;background:var(--blue);border-radius:3px;display:inline-block"></i>DVLA</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:14px;height:14px;background:var(--purple);border-radius:3px;display:inline-block"></i>CRC</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:14px;height:14px;background:var(--amber);border-radius:3px;display:inline-block"></i>RTW</span>
+    </div>
+  </div>
+
+  <div class="card" id="lifecycleList">
+    <h3>Upcoming · next 60 days</h3>
+    <div class="cal-row"><div class="icon training">TRN</div><div><b>Khan, Sara</b> · annual training refresh<br/><span style="color:var(--subtle);font-size:11px">Active driver · DHL Heathrow HRW-09 · last training May 2025</span></div><div><span class="pill amber">Due 14 May</span></div><div style="text-align:center"><b>7 days</b></div><button class="btn sm primary">Schedule</button></div>
+    <div class="cal-row"><div class="icon dvla">DVLA</div><div><b>Lewis, Daniel</b> · annual DVLA recheck<br/><span style="color:var(--subtle);font-size:11px">Active driver · DHL Heathrow HRW-08 · last check 21 May 2025</span></div><div><span class="pill amber">Due 21 May</span></div><div style="text-align:center"><b>14 days</b></div><button class="btn sm primary">Email driver</button></div>
+    <div class="cal-row"><div class="icon crc">CRC</div><div><b>Bennett, Adam</b> · 3-year CRC refresh<br/><span style="color:var(--subtle);font-size:11px">Active driver · DHL Stansted STN-04 · last DBS June 2023</span></div><div><span class="pill amber">Due 4 Jun</span></div><div style="text-align:center"><b>28 days</b></div><button class="btn sm primary">Initiate DBS</button></div>
+    <div class="cal-row"><div class="icon dvla">DVLA</div><div><b>Patel, Raj</b> · annual DVLA recheck<br/><span style="color:var(--subtle);font-size:11px">Active driver · DHL Heathrow HRW-12 · last check 06 May 2026</span></div><div><span class="pill">Due 6 May 2027</span></div><div style="text-align:center"><b>365 days</b></div><button class="btn sm secondary">Pre-schedule</button></div>
+    <div class="cal-row"><div class="icon rtw">RTW</div><div><b>Hassan, Yusuf</b> · visa-based RTW expiry<br/><span style="color:var(--subtle);font-size:11px">Active driver · DHL Gatwick LGW-02 · skilled worker visa expires 6 Jul</span></div><div><span class="pill">Due 6 Jul</span></div><div style="text-align:center"><b>60 days</b></div><button class="btn sm secondary">Pre-schedule</button></div>
+    <div class="cal-row"><div class="icon training">TRN</div><div><b>Lewis, Daniel</b> · annual training refresh<br/><span style="color:var(--subtle);font-size:11px">Active driver · last training 18 Mar 2025</span></div><div><span class="pill">Due 18 Mar 2026</span></div><div style="text-align:center"><b>—</b></div><button class="btn sm secondary">Done · re-scheduled 2027</button></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3>How the lifecycle loop works</h3>
+    <p>Every active driver carries four rolling deadlines: <b>DVLA recheck</b> (annual), <b>UK CRC refresh</b> (every 3 years), <b>RTW expiry</b> (if visa-based), and <b>training refresh</b> (annual). The system fires emails at <b>D-30</b>, <b>D-7</b> and <b>D-0</b> to both the driver and the Director. If the driver doesn't action by D-0, the system places them on hold (cannot be assigned a route) until cleared.</p>
+    <p style="margin-top:10px;color:var(--subtle);font-size:12px">This runs as a Cowork scheduled task — daily at 08:00 it checks every active driver, fires the relevant emails, and updates the dashboard alerts.</p>
+  </div>
+</div>
+
+<!-- ============= AUDIT PACK ============= -->
+<div class="screen" data-screen="audit">
+  <div class="page-title">
+    <div><h1>Audit Pack Export</h1><p>One-click PDF bundle for any driver — all docs, decisions, timestamps</p></div>
+    <div class="actions">
+      <button class="btn secondary" onclick="openModal('View as auditor','Strips internal annotations and shows the audit pack exactly as DHL or CAA would receive it — clean format, sequential pagination, hash references in footer for tamper evidence, redacted internal-only notes.')">View as auditor</button>
+      <button class="btn primary" onclick="openModal('Export audit pack','Generates a single PDF for Patel, R containing: cover sheet, full Central Record snapshot, all 7 documents on file, vetting evidence, every decision timestamped, complete activity log, and the DHL Vetting Form. Ready in ~10 seconds.')">Export PDF →</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Audit pack preview · Patel, Raj · D-2026-0184</h3>
+    <p style="color:var(--text);margin:0 0 14px">This is what a DHL or CAA auditor would receive when you export the pack. Every page is timestamped, traceable, and indexed.</p>
+    <div class="grid-3">
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 1</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Cover sheet &amp; index</div>
+        <div style="font-size:12px;color:var(--subtle)">Driver ID, dates, contents page, retention period, classification.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 2</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Central Record snapshot</div>
+        <div style="font-size:12px;color:var(--subtle)">Every field, current and historical values, with provenance.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 3</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Documents</div>
+        <div style="font-size:12px;color:var(--subtle)">7 attachments inline with sha-256 hashes for tamper evidence.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 4</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Vetting evidence</div>
+        <div style="font-size:12px;color:var(--subtle)">DVLA, RTW, sanctions, CRC results with timestamp.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 5</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Decisions log</div>
+        <div style="font-size:12px;color:var(--subtle)">Pre-screen, suitability, VRA, client allocation — who, when, why.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 6</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Activity log</div>
+        <div style="font-size:12px;color:var(--subtle)">Every field change · immutable · timestamped · actor recorded.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 7</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">DHL submission</div>
+        <div style="font-size:12px;color:var(--subtle)">Auto-populated DHL Vetting Form, APHIDS reference, approval letter.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 8</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Operational</div>
+        <div style="font-size:12px;color:var(--subtle)">Van handover photos, e-signed contracts, training certificates.</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--line);padding:14px;border-radius:8px">
+        <div style="font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.05em;text-transform:uppercase">Section 9</div>
+        <div style="font-weight:700;font-size:14px;margin:4px 0">Lifecycle compliance</div>
+        <div style="font-size:12px;color:var(--subtle)">Renewal history with evidence of timely action.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bulk export · multi-driver audit response</h3>
+    <p style="color:var(--text);margin:0 0 12px">If DHL requests audit packs for multiple drivers, the bulk exporter packages them into a zip with an index sheet. Tested with a 12-driver audit request — 90 seconds end-to-end.</p>
+    <button class="btn secondary" onclick="openModal('Bulk audit pack','Select drivers from the pipeline (or by stage / date range) and Cowork generates a zip with one PDF per driver plus a master index. Includes hash verification for tamper evidence.')">Configure bulk export</button>
+  </div>
+</div>
+
+<!-- ============= ARCHITECTURE ============= -->
+<div class="screen" data-screen="arch">
+  <div class="page-title">
+    <div><h1>Architecture &amp; data flow</h1><p>C4-style documentation · system context · containers · components · deployment · sequences</p></div>
+  </div>
+
+  <div class="archnotes"><b>The thesis</b> — one Central Driver Record sits in Notion. Every screen, every form, every export reads and writes from it. No data is duplicated. The system is built from no-code components but architected like a real product, documented to <a href="https://c4model.com" target="_blank">C4 model</a> standards.</div>
+
+  <div class="card">
+    <div class="c4-tabs" id="c4Tabs">
+      <div class="c4-tab active" data-c4="context">L1 · System Context</div>
+      <div class="c4-tab" data-c4="container">L2 · Containers</div>
+      <div class="c4-tab" data-c4="component">L3 · Components</div>
+      <div class="c4-tab" data-c4="deploy">Deployment</div>
+      <div class="c4-tab" data-c4="pipeline">Pipeline flow</div>
+      <div class="c4-tab" data-c4="data">Data model</div>
+      <div class="c4-tab" data-c4="state">Driver state</div>
+    </div>
+
+    <!-- LEVEL 1: SYSTEM CONTEXT -->
+    <div class="c4-panel active" data-c4-panel="context">
+      <p><span class="c4-level-tag">C4 · L1</span> The DOS in its environment. Who uses it, what it talks to.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+flowchart TB
+    Driver(["Driver - applicant or active"])
+    Director(["Thiago - Director, BA Express"])
+    DOS["BA EXPRESS DOS<br/>Driver Operating System<br/>Single record - Multi-client ready"]
+    DHL[("DHL Express<br/>Service Partner Manager<br/>+ APHIDS submission")]
+    DVLA[("GOV.UK DVLA<br/>licence verification<br/>via share code")]
+    GOVRTW[("GOV.UK<br/>Right to Work check")]
+    Broker[("Insurance Broker<br/>fleet insurance, exception quotes")]
+    DBS[("GOV.UK DBS<br/>Basic criminal record check")]
+    HMRC[("HMRC<br/>self-employment evidence")]
+    Sanctions[("Sanctions service<br/>Worldcheck")]
+    Future["Future clients<br/>Amazon, FedEx, UPS"]
+    Driver -->|"applies, uploads docs, uses portal"| DOS
+    Director -->|"operates, decides, signs off"| DOS
+    DOS -->|"submits via APHIDS"| DHL
+    DOS -.->|"future modules"| Future
+    DOS -->|"verifies licence"| DVLA
+    DOS -->|"verifies RTW"| GOVRTW
+    DOS -->|"requests quotes"| Broker
+    DOS -->|"orders DBS basic"| DBS
+    DOS -->|"verifies SA evidence"| HMRC
+    DOS -->|"sanctions screen"| Sanctions
+    DHL -->|"approval"| DOS
+    classDef user fill:#FFFFFF,stroke:#374151,stroke-width:2px,color:#111827;
+    classDef sys fill:#bf1d23,stroke:#9e0006,color:#fff,stroke-width:2px;
+    classDef ext fill:#E1ECF7,stroke:#1F4E8C,color:#1F4E8C;
+    classDef fut fill:#F2F4F7,stroke:#667085,color:#667085,stroke-dasharray:4 3;
+    class Driver,Director user;
+    class DOS sys;
+    class DHL,DVLA,GOVRTW,Broker,DBS,HMRC,Sanctions ext;
+    class Future fut;
+</pre>
+      </div>
+    </div>
+
+    <!-- LEVEL 2: CONTAINERS -->
+    <div class="c4-panel" data-c4-panel="container">
+      <p><span class="c4-level-tag">C4 · L2</span> The technology containers inside the DOS. Each is a runnable thing with a clear responsibility.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+flowchart TB
+    Driver(["Driver"])
+    Director(["Director"])
+    DHL[("DHL")]
+    Ext[("GOV.UK, DVLA<br/>Broker, DBS")]
+    subgraph DOS["BA EXPRESS DOS"]
+        direction TB
+        ApplyForm["Apply Form<br/>Tally - public web form"]
+        UploadForm["Upload Portal<br/>Tally - magic-link self-service"]
+        CDR[("CENTRAL DRIVER RECORD<br/>Notion DB - single source of truth")]
+        Workflow["Workflow Engine<br/>Make - scenarios and scheduled tasks"]
+        Dashboard["Director Dashboard<br/>Cowork artifact - live HTML"]
+        Portal["Driver Portal<br/>Cowork artifact - driver-scoped"]
+        Analytics["Analytics<br/>Cowork artifact"]
+        DocGen["Document Generator<br/>Cowork docx and pdf skills"]
+        Esign["E-sign<br/>Dropbox Sign - contracts"]
+        Mailer["Mailer<br/>Gmail templated"]
+        Cowork["Cowork<br/>orchestration, skills, memory"]
+    end
+    Driver -->|"applies"| ApplyForm
+    Driver -->|"uploads docs"| UploadForm
+    Driver -->|"portal access"| Portal
+    Director -->|"reviews and decides"| Dashboard
+    Director -->|"opens record"| Dashboard
+    ApplyForm -->|"webhook"| Workflow
+    UploadForm -->|"webhook"| Workflow
+    Workflow -->|"read or write"| CDR
+    Dashboard -.->|"reads"| CDR
+    Portal -.->|"reads"| CDR
+    Analytics -.->|"reads"| CDR
+    DocGen -.->|"reads"| CDR
+    DocGen --> Esign
+    Workflow --> Mailer
+    Workflow --> Ext
+    DocGen --> DHL
+    Cowork -.->|"orchestrates"| CDR
+    Cowork -.->|"orchestrates"| DocGen
+    Cowork -.->|"orchestrates"| Workflow
+    Cowork -.->|"orchestrates"| Dashboard
+    classDef user fill:#FFFFFF,stroke:#374151,stroke-width:2px,color:#111827;
+    classDef record fill:#fde8e9,stroke:#bf1d23,color:#111827,stroke-width:2px;
+    classDef container fill:#111827,color:#fff;
+    classDef cowork fill:#7B5BA1,color:#fff;
+    classDef ext fill:#E1ECF7,stroke:#1F4E8C,color:#1F4E8C;
+    class Driver,Director user;
+    class CDR record;
+    class ApplyForm,UploadForm,Workflow,Dashboard,Portal,Analytics,DocGen,Esign,Mailer container;
+    class Cowork cowork;
+    class DHL,Ext ext;
+</pre>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:var(--text)"><b>Reading the diagram:</b> rounded boxes are containers (a runnable piece of tech). The red box is the data layer. Solid arrows are direct calls / writes. Dotted arrows are reads. Cowork sits as an orchestrator over everything but doesn't replace any container — it composes and operates them.</p>
+    </div>
+
+    <!-- LEVEL 3: COMPONENTS -->
+    <div class="c4-panel" data-c4-panel="component">
+      <p><span class="c4-level-tag">C4 · L3</span> Zooming into the Central Driver Record container. Each component is a section of the schema with its own write source and read consumers.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+flowchart LR
+    subgraph CDR["CENTRAL DRIVER RECORD - Notion DB"]
+        direction TB
+        P["Personal and Contact<br/>name, DOB, NI<br/>address, phone, email"]
+        L["Licence and Driving<br/>licence number, categories<br/>points, endorsements"]
+        E["Eligibility and RTW<br/>RTW status, share code<br/>insurance exception flags"]
+        H["5-year History<br/>employment, gaps<br/>references"]
+        D["Documents<br/>ID, POA, CRC<br/>photo licence, refs"]
+        V["Vetting Results<br/>ID, sanctions, DVLA<br/>UK CRC, Intl CRC, VRA"]
+        C["Client Allocation<br/>client, APHIDS ref<br/>approval state"]
+        O["Operational<br/>van, contracts<br/>fuel, PDA, routes"]
+        T["Training and Compliance<br/>induction, HS, GDPR<br/>renewal calendar"]
+        S["Pipeline State<br/>current stage, SLA<br/>deadline, overdue flag"]
+        AL["Audit Log<br/>immutable, every<br/>field change"]
+    end
+    Apply["Tally Apply form"] -->|"writes"| P
+    Apply -->|"writes"| L
+    Apply -->|"writes"| E
+    Apply -->|"writes"| H
+    Upload["Tally Upload form"] -->|"writes"| D
+    Auto["Auto-checks via Make"] -->|"writes"| V
+    Auto -->|"writes"| E
+    Director["Director decisions"] -->|"writes"| V
+    Director -->|"writes"| C
+    Director -->|"writes"| S
+    Operations["Operations actions"] -->|"writes"| O
+    Operations -->|"writes"| T
+    All["All writes"] -.->|"appends"| AL
+    P --> Out1["DHL form gen"]
+    L --> Out1
+    V --> Out1
+    Out1 --> DHL(["DHL"])
+    O --> Out2["Hire contract gen"]
+    Out2 --> Esign(["E-sign"])
+    P --> Out3["Driver Portal"]
+    O --> Out3
+    T --> Out3
+    AL --> Out4["Audit pack export"]
+    classDef rec fill:#fde8e9,stroke:#bf1d23,color:#111827;
+    classDef src fill:#111827,color:white;
+    classDef out fill:#FFF4E0,stroke:#C77800,color:#111827;
+    classDef ext fill:#E1ECF7,stroke:#1F4E8C,color:#1F4E8C;
+    class P,L,E,H,D,V,C,O,T,S,AL rec;
+    class Apply,Upload,Auto,Director,Operations,All src;
+    class Out1,Out2,Out3,Out4 out;
+    class DHL,Esign ext;
+</pre>
+      </div>
+    </div>
+
+    <!-- DEPLOYMENT -->
+    <div class="c4-panel" data-c4-panel="deploy">
+      <p><span class="c4-level-tag">DEPLOYMENT</span> Where each container runs. Almost everything is SaaS; nothing is self-hosted.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+flowchart TB
+    subgraph BAExpress["BA Express devices"]
+        DirectorPC["Director laptop<br/>Chrome browser"]
+        DriverPhone["Driver mobile<br/>iOS or Android browser"]
+    end
+    subgraph NotionCloud["Notion Cloud - EU"]
+        CDR[("Notion DB<br/>Central Driver Record")]
+    end
+    subgraph TallyCloud["Tally Cloud"]
+        TallyApp["Apply form"]
+        TallyUp["Upload form"]
+    end
+    subgraph MakeCloud["Make Cloud"]
+        Scenarios["Scenarios and scheduled tasks"]
+    end
+    subgraph CoworkCloud["Cowork - Anthropic"]
+        Skills["Skills - docx, pdf, xlsx"]
+        Artifacts["Artifacts - dashboard, portal, analytics"]
+        ScheduledTasks["Scheduled tasks - daily 08:00"]
+        Memory["Persistent memory"]
+    end
+    subgraph DropSignCloud["Dropbox Sign"]
+        DSign["E-sign templates"]
+    end
+    subgraph Google["Google Workspace - BA Express"]
+        Gmail["Gmail - driver comms"]
+        GCal["Calendar - interview booking"]
+        Drive["Drive - backup"]
+    end
+    DirectorPC -->|"Chrome"| Artifacts
+    DirectorPC -->|"Chrome"| CDR
+    DriverPhone -->|"Chrome or Safari"| TallyApp
+    DriverPhone -->|"Chrome or Safari"| TallyUp
+    DriverPhone -->|"Chrome or Safari"| Artifacts
+    TallyApp -->|"webhook"| Scenarios
+    TallyUp -->|"webhook"| Scenarios
+    Scenarios -->|"API"| CDR
+    Skills -->|"API"| CDR
+    Artifacts -->|"API"| CDR
+    Scenarios --> Gmail
+    Scenarios --> DSign
+    ScheduledTasks --> Scenarios
+    Skills --> Drive
+    classDef device fill:#111827,color:#fff;
+    classDef cloud fill:#FFF4E0,stroke:#C77800,color:#111827;
+    classDef cdr fill:#fde8e9,stroke:#bf1d23,color:#111827,stroke-width:2px;
+    classDef cowork fill:#EEE6F6,stroke:#7B5BA1,color:#7B5BA1;
+    class DirectorPC,DriverPhone device;
+    class TallyApp,TallyUp,Scenarios,DSign,Gmail,GCal,Drive cloud;
+    class CDR cdr;
+    class Skills,Artifacts,ScheduledTasks,Memory cowork;
+</pre>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:var(--text)"><b>Operational note:</b> there is no on-premise infrastructure. Backups are automatic via Notion's cloud + a weekly export to Google Drive triggered by a Cowork scheduled task. RTO &lt; 4 hours, RPO &lt; 24 hours.</p>
+    </div>
+
+    <!-- PIPELINE FLOW -->
+    <div class="c4-panel" data-c4-panel="pipeline">
+      <p><span class="c4-level-tag">PROCESS</span> End-to-end pipeline from application to active driver, with the Central Record at the centre.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+flowchart TD
+    A(["Driver applies<br/>baexpress.co.uk"]):::entry --> B["Tally form"]:::ba
+    B --> CDR[("CENTRAL DRIVER<br/>RECORD - Notion")]:::data
+    CDR --> PS{"Pre-screen<br/>auto-rules"}:::dec
+    PS -->|"No RTW"| RJ["Auto-reject"]:::rej
+    PS -->|"Age under 25 or exp under 1yr"| EX["Insurance Exception<br/>broker quote"]:::amber
+    PS -->|"Pass"| INT["Interview<br/>and Suitability"]:::ba
+    EX -->|"Approved"| INT
+    EX -->|"Declined"| RJ
+    INT --> SUIT{"Director<br/>signs off?"}:::dec
+    SUIT -->|"No"| RJ
+    SUIT -->|"Yes"| DOC["Document upload<br/>self-service"]:::driver
+    DOC --> CDR
+    DOC --> AUTO["Auto-checks<br/>RTW, DVLA, Sanctions"]:::auto
+    AUTO --> VET["Vetting review<br/>UK CRC, references"]:::ba
+    VET --> CK{"All checks pass?"}:::dec
+    CK -->|"Concerns"| VRA["VRA assessment"]:::amber
+    CK -->|"Pass"| DHL["DHL form auto-gen<br/>and APHIDS"]:::dhl
+    VRA -->|"Acceptable"| DHL
+    VRA -->|"Not acceptable"| RJ
+    DHL --> DAPP{"DHL approves?"}:::dec
+    DAPP -->|"Pending"| HOLD["On hold<br/>auto-chase D+3"]:::amber
+    HOLD --> DAPP
+    DAPP -->|"Yes"| VAN["Van and handover<br/>e-signed"]:::ba
+    VAN --> TRN["Training and induction"]:::ba
+    TRN --> PORT[("Driver Portal<br/>live")]:::portal
+    PORT --> ACT(["ACTIVE DRIVER<br/>first route"]):::active
+    ACT --> LIFE["Lifecycle loop<br/>DVLA, CRC, RTW, training"]:::loop
+    LIFE -.->|"recheck"| CDR
+    CDR -.->|"feeds"| DHL
+    CDR -.->|"feeds"| VAN
+    CDR -.->|"feeds"| PORT
+    CDR -.->|"feeds"| PAY[("Payroll record")]:::data
+    classDef entry fill:#FFFFFF,stroke:#374151,stroke-width:2px,color:#111827;
+    classDef ba fill:#111827,color:#FFFFFF;
+    classDef driver fill:#FFFFFF,stroke:#374151,stroke-width:1.5px,color:#111827;
+    classDef dec fill:#FFF4E0,stroke:#C77800,color:#111827;
+    classDef rej fill:#bf1d23,color:#FFFFFF;
+    classDef amber fill:#FFE9B8,stroke:#C77800,color:#111827;
+    classDef dhl fill:#E1ECF7,stroke:#1F4E8C,color:#1F4E8C;
+    classDef portal fill:#E5F3EC,stroke:#2E7D54,color:#2E7D54;
+    classDef active fill:#2E7D54,color:#FFFFFF;
+    classDef data fill:#fde8e9,stroke:#bf1d23,color:#111827,stroke-width:2px;
+    classDef auto fill:#1F4E8C,color:#FFFFFF;
+    classDef loop fill:#7B5BA1,color:#FFFFFF;
+</pre>
+      </div>
+    </div>
+
+    <!-- DATA MODEL -->
+    <div class="c4-panel" data-c4-panel="data">
+      <p><span class="c4-level-tag">DATA</span> Single source of truth. Every downstream artefact reads from it.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+flowchart LR
+    subgraph CDR["CENTRAL DRIVER RECORD (Notion)"]
+        direction TB
+        P[Personal &amp; Contact]
+        L[Licence &amp; Driving]
+        E[Eligibility &amp; RTW]
+        H[5-year History]
+        V[Vetting Results]
+        C[Client Allocation]
+        O[Operational]
+        T[Training &amp; Compliance]
+        AL[Audit Log]
+    end
+    Web[Tally Application] --> CDR
+    Auto[Auto-check APIs<br/>future: Onfido, DVLA] --> CDR
+    Director[Director Decisions] --> CDR
+    Driver[Driver Self-Service] --> CDR
+    CDR --> DHL[DHL Vetting Form<br/>auto-generated .docx]
+    CDR --> VAN[Van Hire Contract<br/>via Dropbox Sign]
+    CDR --> PAY[Payroll Setup]
+    CDR --> PORT[Driver Portal<br/>artifact]
+    CDR --> AUDIT[Audit Pack<br/>generated PDF]
+    classDef rec fill:#fde8e9,stroke:#bf1d23,color:#111827;
+    classDef src fill:#111827,color:white;
+    classDef out fill:#E1ECF7,stroke:#1F4E8C,color:#1F4E8C;
+    class P,L,E,H,V,C,O,T,AL rec;
+    class Web,Auto,Director,Driver src;
+    class DHL,VAN,PAY,PORT,AUDIT out;
+</pre>
+      </div>
+    </div>
+
+    <!-- DRIVER STATE MACHINE -->
+    <div class="c4-panel" data-c4-panel="state">
+      <p><span class="c4-level-tag">STATE</span> Every driver is in exactly one state at any moment. Transitions are logged with actor + reason.</p>
+      <div class="seqbox">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> Application
+    Application --> PreScreen: form submitted
+    PreScreen --> Rejected: no RTW
+    PreScreen --> Exception: under 25 or under 1yr
+    PreScreen --> Interview: pass standard
+    Exception --> Interview: broker approves
+    Exception --> Rejected: broker declines
+    Interview --> Suitability: held
+    Suitability --> Documents: Director approves
+    Suitability --> Rejected: Director declines
+    Documents --> Vetting: all uploaded
+    Documents --> Withdrawn: 7 days no upload
+    Vetting --> VRA: concerns flagged
+    Vetting --> ClientAlloc: all checks pass
+    VRA --> ClientAlloc: acceptable
+    VRA --> Rejected: not acceptable
+    ClientAlloc --> DHLPending: submit to DHL
+    DHLPending --> DHLApproved: DHL approves
+    DHLPending --> DHLRejected: DHL declines
+    DHLApproved --> VanHandover: van assigned
+    VanHandover --> Training: contracts signed
+    Training --> Active: training complete
+    Active --> Active: lifecycle re-vetting
+    Active --> Suspended: incident or expired
+    Suspended --> Active: cleared
+    Suspended --> Rejected: not cleared
+    Active --> Offboarded: leaves
+    Offboarded --> [*]
+    Rejected --> [*]
+    Withdrawn --> [*]
+    DHLRejected --> ClientAlloc: try other client
+</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Tech stack · what's running</h3>
+    <table>
+      <thead><tr><th>Layer</th><th>Tool</th><th>Role</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td><b>Database</b></td><td>Notion</td><td>Central Driver Record · single source of truth</td><td>£8/mo</td></tr>
+        <tr><td><b>Application form</b></td><td>Tally</td><td>Public driver-facing form on baexpress.co.uk/apply</td><td>£0–24/mo</td></tr>
+        <tr><td><b>Document upload</b></td><td>Tally (2nd form)</td><td>Magic-link self-service upload portal</td><td>included</td></tr>
+        <tr><td><b>Workflow automation</b></td><td>Make</td><td>Tally → Notion · scheduled tasks · DHL chase emails</td><td>£8/mo</td></tr>
+        <tr><td><b>Director Dashboard</b></td><td>Cowork artifact</td><td>Live HTML reading Notion · KPIs · funnel · queue</td><td>£0</td></tr>
+        <tr><td><b>Driver Portal</b></td><td>Cowork artifact</td><td>Driver-scoped views · schedule · payslip · SOPs</td><td>£0</td></tr>
+        <tr><td><b>Analytics</b></td><td>Cowork artifact</td><td>Funnel · cycle time · source-of-hire</td><td>£0</td></tr>
+        <tr><td><b>E-signature</b></td><td>Dropbox Sign</td><td>Van hire contract · deductions agreement</td><td>£15/mo</td></tr>
+        <tr><td><b>Document generation</b></td><td>Cowork docx skill</td><td>DHL Vetting Form · contracts · runbook</td><td>£0</td></tr>
+        <tr><td><b>Audit pack export</b></td><td>Cowork pdf skill</td><td>One-click multi-section PDF</td><td>£0</td></tr>
+        <tr><td><b>Lifecycle reminders</b></td><td>Cowork scheduled tasks + Make</td><td>DVLA · CRC · RTW · training auto-emails</td><td>included</td></tr>
+        <tr><td><b>Email</b></td><td>BA Express Google Workspace</td><td>Templated driver comms · DHL handoff</td><td>existing</td></tr>
+        <tr><td colspan="3" style="text-align:right"><b>Total monthly</b></td><td><b>£31–55</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>What plugs in next (Level 3)</h3>
+    <p>Already designed for: <b>Onfido / Yoti</b> ID verification (replaces manual ID review), <b>DVLA API</b> (replaces manual share-code lookup), <b>Amazon DSP / FedEx / UPS</b> client modules (additional output forms generated from the same Central Record), <b>Driver-fit ML scoring</b> (predictive matching at application). Each is a defined plugin point in the architecture above.</p>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="closeModalBg(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 id="modalTitle">Action</h3>
+      <span class="x" onclick="closeModal()">×</span>
+    </div>
+    <div class="modal-body" id="modalBody">…</div>
+    <div class="modal-foot">
+      <button class="btn secondary" onclick="closeModal()">Close</button>
+      <button class="btn primary" onclick="closeModal()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-bg" id="successBg" onclick="closeModalBg(event,true)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="success-screen">
+      <div class="check">✓</div>
+      <h2>Application submitted</h2>
+      <p>Thanks Sophie — your application is in. A pre-screen has run and you've passed. Check your inbox: you'll have an interview booking link within the hour. Track your status live at <code style="background:var(--bg);padding:2px 8px;border-radius:4px">apply.baexpress.co.uk/status</code></p>
+      <p style="font-size:11px;color:var(--subtle);margin-top:14px">D-2026-0193 created in Central Record · interview email queued · Director notified · pipeline updated.</p>
+      <button class="btn primary" onclick="closeModal();go('dashboard')">See it in the Director Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{primaryColor:'#111827',primaryTextColor:'#FFFFFF',primaryBorderColor:'#374151',lineColor:'#bf1d23',fontSize:'12px'},flowchart:{curve:'basis',nodeSpacing:32,rankSpacing:42}});
+
+// NAVIGATION
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.topnav .links a').forEach(a=>a.classList.remove('active'));
+  const target = document.querySelector(`.screen[data-screen="${name}"]`);
+  if(target){
+    target.classList.add('active');
+    const link = document.querySelector(`.topnav .links a[data-go="${name}"]`);
+    if(link) link.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    // No-op: mermaid renders all diagrams once on startOnLoad. Navigation just toggles screens.
+  }
+}
+
+document.querySelectorAll('[data-go]').forEach(el=>{
+  el.addEventListener('click',e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const target = el.dataset.go;
+    if(target) go(target);
+  });
+});
+
+// MULTI-STEP APPLY FORM
+function apStep(n){
+  document.querySelectorAll('.applybg .formarea').forEach(a=>a.style.display='none');
+  document.querySelector(`.applybg .formarea[data-step="${n}"]`).style.display='block';
+  // update progress
+  const steps = document.querySelectorAll('#apProgress .step');
+  const labels = document.querySelectorAll('#apLabels .step');
+  steps.forEach((s,i)=>{
+    s.className = 'step' + (i+1<n?' done':(i+1===n?' active':''));
+    labels[i].className = 'step' + (i+1<n?' done':(i+1===n?' active':''));
+  });
+  document.querySelector('.applybg').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function resetApply(){ apStep(1); }
+function submitApply(){
+  document.getElementById('successBg').classList.add('open');
+}
+
+// DRIVER RECORD TABS
+document.querySelectorAll('.rec-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.rec-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.rec-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll(`.rec-panel[data-panel="${target}"]`).forEach(p=>p.classList.add('active'));
+  });
+});
+
+// MODAL
+function openModal(title,body){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modalBg').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('open');
+  document.getElementById('successBg').classList.remove('open');
+}
+function closeModalBg(e,isSuccess){
+  if(e.target.id==='modalBg' || e.target.id==='successBg'){ closeModal(); }
+}
+
+// MOBILE PORTAL TOGGLE
+function setPortalView(mode, btn){
+  const portal = document.getElementById('driverPortal');
+  if(!portal) return;
+  if(mode === 'mobile') portal.classList.add('mobile-view');
+  else portal.classList.remove('mobile-view');
+  if(btn && btn.parentElement){
+    btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('toggle-on'));
+    btn.classList.add('toggle-on');
+  }
+}
+
+// ANALYTICS PERIOD TOGGLE (visual only — flips the kpi numbers)
+const periodData = {
+  '7d':  { applications:'12', activations:'4', cycle:'5.4', cost:'£385', dApp:'↑ Last 7 days only', dAct:'4 active this week', dCycle:'fastest week ever', dCost:'best week' },
+  '30d': { applications:'38', activations:'16', cycle:'5.8', cost:'£412', dApp:'↑ 22% vs prior 30d', dAct:'↑ 6 vs prior 30d', dCycle:'↓ 19 days vs Jan', dCost:'↓ £680 vs old process' },
+  'ytd': { applications:'142', activations:'58', cycle:'7.1', cost:'£455', dApp:'YTD total', dAct:'YTD activations', dCycle:'incl. pre-launch period', dCost:'incl. pre-launch period' }
+};
+function setPeriod(p, btn){
+  const wrap = document.getElementById('periodToggle');
+  if(wrap){ wrap.querySelectorAll('button').forEach(b=>b.classList.remove('toggle-on')); }
+  if(btn) btn.classList.add('toggle-on');
+  const data = periodData[p];
+  if(!data) return;
+  const kpis = document.querySelectorAll('[data-screen="analytics"] .kpi');
+  if(kpis.length>=4){
+    kpis[0].querySelector('.v').innerHTML = data.applications;
+    kpis[0].querySelector('.d').innerHTML = data.dApp;
+    kpis[1].querySelector('.v').innerHTML = data.activations;
+    kpis[1].querySelector('.d').innerHTML = data.dAct;
+    kpis[2].querySelector('.v').innerHTML = data.cycle + '<small>d</small>';
+    kpis[2].querySelector('.d').innerHTML = data.dCycle;
+    kpis[3].querySelector('.v').innerHTML = data.cost;
+    kpis[3].querySelector('.d').innerHTML = data.dCost;
+  }
+}
+
+// LIFECYCLE VIEW TOGGLE
+function setLifecycleView(view, btn){
+  const wrap = document.getElementById('lifecycleToggle');
+  if(wrap){ wrap.querySelectorAll('button').forEach(b=>b.classList.remove('toggle-on')); }
+  if(btn) btn.classList.add('toggle-on');
+  const gantt = document.getElementById('lifecycleGantt');
+  const list = document.getElementById('lifecycleList');
+  if(view === 'cal'){
+    if(gantt) gantt.style.display = 'block';
+    if(list) list.style.display = 'none';
+  } else {
+    if(gantt) gantt.style.display = 'none';
+    if(list) list.style.display = 'block';
+  }
+}
+
+// C4 TABS — visibility toggle only (mermaid renders all diagrams on startOnLoad)
+document.querySelectorAll('.c4-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const target = tab.dataset.c4;
+    document.querySelectorAll('.c4-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.c4-panel').forEach(p=>p.classList.remove('active'));
+    const panel = document.querySelector(`.c4-panel[data-c4-panel="${target}"]`);
+    if(panel) panel.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

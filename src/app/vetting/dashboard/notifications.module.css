@@ -1,0 +1,396 @@
+.notificationsBlock {
+  margin: 28px 0;
+  padding: 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(249, 250, 251, 0.88)
+  );
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 12px 40px -12px rgba(0, 0, 0, 0.08),
+    inset 0 1px rgba(255, 255, 255, 0.85);
+}
+
+.notificationsTitle {
+  margin: 0 0 16px;
+  color: #111827;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.notificationStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.statItem {
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.statItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.statApproved {
+  border-color: rgba(24, 154, 85, 0.2);
+  background: rgba(24, 154, 85, 0.05);
+}
+
+.statPending {
+  border-color: rgba(196, 125, 16, 0.2);
+  background: rgba(196, 125, 16, 0.05);
+}
+
+.statRejected {
+  border-color: rgba(191, 29, 35, 0.2);
+  background: rgba(191, 29, 35, 0.05);
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: #737d8c;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.statValue {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+.notificationsList {
+  display: grid;
+  gap: 10px;
+}
+
+.notificationItem {
+  padding: 14px 16px;
+  background: #fff;
+  border-left: 4px solid #c47d10;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notificationItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(2px);
+}
+
+.notificationUnread {
+  background: rgba(196, 125, 16, 0.08);
+  font-weight: 500;
+}
+
+.notificationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.documentLabel {
+  font-weight: 600;
+  color: #111827;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.badgeapproved {
+  background: rgba(24, 154, 85, 0.15);
+  color: #189a55;
+  border: 1px solid rgba(24, 154, 85, 0.3);
+}
+
+.badgerejected {
+  background: rgba(191, 29, 35, 0.15);
+  color: #bf1d23;
+  border: 1px solid rgba(191, 29, 35, 0.3);
+}
+
+.badgepending,
+.badgepending-review {
+  background: rgba(196, 125, 16, 0.15);
+  color: #c47d10;
+  border: 1px solid rgba(196, 125, 16, 0.3);
+}
+
+.statusApproved {
+  border-left-color: #189a55;
+}
+
+.statusRejected {
+  border-left-color: #bf1d23;
+}
+
+.statusPending,
+.statusPending-review {
+  border-left-color: #c47d10;
+}
+
+.adminFeedback {
+  margin: 10px 0 0;
+  padding: 8px;
+  background: rgba(17, 24, 39, 0.04);
+  border-left: 2px solid #737d8c;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.adminFeedback strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.notificationMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: #737d8c;
+}
+
+.timestamp {
+  font-weight: 500;
+}
+
+.reviewer {
+  font-style: italic;
+}
+
+.emptyState,
+.loadingState {
+  padding: 24px;
+  text-align: center;
+  color: #737d8c;
+  font-size: 0.95rem;
+}
+
+/* ── Document Submission Form ─────────────────────────────────────── */
+
+.submissionFormBlock {
+  margin-top: 12px;
+}
+
+.submissionToggle {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(191, 29, 35, 0.08),
+    rgba(191, 29, 35, 0.04)
+  );
+  border: 1px solid rgba(191, 29, 35, 0.2);
+  border-radius: 6px;
+  color: #bf1d23;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.submissionToggle:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(191, 29, 35, 0.12),
+    rgba(191, 29, 35, 0.08)
+  );
+  border-color: rgba(191, 29, 35, 0.3);
+}
+
+.toggleArrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+}
+
+.submissionForm {
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(191, 29, 35, 0.05);
+  border: 1px solid rgba(191, 29, 35, 0.15);
+  border-radius: 8px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.submissionInstructions {
+  margin-bottom: 14px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.submissionInstructions h4 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.submissionInstructions ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.submissionInstructions li {
+  margin-bottom: 6px;
+}
+
+.submissionFields {
+  display: grid;
+  gap: 12px;
+}
+
+.formGroup {
+  display: grid;
+  gap: 6px;
+}
+
+.formLabel {
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.formInput {
+  padding: 8px 10px;
+  border: 1px solid rgba(191, 29, 35, 0.2);
+  border-radius: 6px;
+  background: #fff;
+  color: #111827;
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #bf1d23;
+  box-shadow: 0 0 0 3px rgba(191, 29, 35, 0.1);
+}
+
+.formHint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #737d8c;
+  font-style: italic;
+}
+
+.submitButton {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #bf1d23, #d42a32);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(191, 29, 35, 0.3);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+.submissionNote {
+  margin: 0;
+  padding: 0;
+  font-size: 0.78rem;
+  color: #737d8c;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.submissionNote strong {
+  color: #bf1d23;
+  font-weight: 600;
+}
+
+.emailCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #111827;
+  font-size: 0.85rem;
+  font-weight: 500;
+  user-select: none;
+}
+
+.checkboxInput {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #bf1d23;
+}
+
+@media (max-width: 600px) {
+  .notificationStats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .notificationMeta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .submissionToggle {
+    font-size: 0.8rem;
+  }
+
+  .submissionForm {
+    padding: 12px;
+  }
+}
