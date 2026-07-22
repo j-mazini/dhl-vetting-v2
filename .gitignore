@@ -59,3 +59,4 @@ _gh-pages/
 # Lock files (but commit package-lock.json for npm ci)
 yarn.lock
 pnpm-lock.yaml
+.vercel

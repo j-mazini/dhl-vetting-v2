@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
 import { siteMeta } from '@/content/baExpress';
+import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
 
 const inter = Inter({
@@ -44,7 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en-GB" className={`${inter.variable} ${montserrat.variable}`}>
       <body className={inter.className} suppressHydrationWarning>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
