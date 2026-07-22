@@ -31,14 +31,17 @@ jobs:
         working-directory: aplicacoes/ba-express-vetting
         run: npm ci
 
-      - name: Build Next.js (static export)
+      - name: Build Next.js
         working-directory: aplicacoes/ba-express-vetting
         run: npm run build
+
+      - name: Export landing page
+        run: node .github/scripts/export-landing.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "aplicacoes/ba-express-vetting/out"
+          path: "_gh-pages"
 
   deploy:
     environment:

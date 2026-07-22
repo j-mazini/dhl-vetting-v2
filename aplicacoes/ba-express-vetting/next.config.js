@@ -4,7 +4,6 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3011/api/v1'
 const nextConfig = {
   reactStrictMode: true,
   compress: true,
-  output: 'export',
 
   // Allow images from baexpress.co.uk
   images: {
