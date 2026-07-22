@@ -138,13 +138,18 @@ const DOC_LABEL: Record<string, string> = {
   approved: 'Approved',
 };
 
-const DOCUMENT_LABELS = Object.fromEntries(
-  CHECKLIST_STEPS.flatMap((step) =>
-    step.items
-      .filter((item) => item.docKey && !item.hidden)
-      .map((item) => [item.docKey!, item.title]),
-  ),
-);
+const DOCUMENT_LABELS: Record<string, string> = {
+  dbs: 'DBS Check',
+  dvla: 'DVLA Check',
+  insurance: 'Insurance Verification',
+  licence: 'Driving Licence',
+  rightToWork: 'Right to Work',
+  references: 'References',
+  address: 'Address History',
+  workHistory: 'Work History',
+  medicals: 'Medicals',
+  interview: 'Interview',
+};
 
 interface PendingDocument {
   docKey: string;
@@ -861,3 +866,6 @@ export default function CandidateDashboard() {
     </div>
   );
 }
+
+export const dynamic = 'force-dynamic';
+export const dynamicParams = false;

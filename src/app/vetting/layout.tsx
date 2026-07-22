@@ -1,3 +1,5 @@
+'use client';
+
 import { AuthProvider } from '@/context/AuthContext';
 
 export default function VettingLayout({ children }: { children: React.ReactNode }) {

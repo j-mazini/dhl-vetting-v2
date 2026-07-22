@@ -2,7 +2,6 @@
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3011/api/v1';
 
 const nextConfig = {
-  output: 'export',
   reactStrictMode: true,
   compress: true,
   images: {
