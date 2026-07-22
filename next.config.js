@@ -2,11 +2,11 @@
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3011/api/v1';
 
 const nextConfig = {
+  output: 'export',
   reactStrictMode: true,
   compress: true,
-
-  // Allow images from baexpress.co.uk
   images: {
+    unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'baexpress.co.uk' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
