@@ -13,10 +13,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\"",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "rules:check": "tsx scripts/check-live-rules.ts",
-    "rules:deploy": "tsx scripts/deploy-rules.ts",
-    "seed:assessment": "tsx scripts/seed-assessment.ts"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
