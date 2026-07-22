@@ -56,7 +56,6 @@ arquivo/
 # GitHub Pages export
 _gh-pages/
 
-# Lock files
-package-lock.json
+# Lock files (but commit package-lock.json for npm ci)
 yarn.lock
 pnpm-lock.yaml
