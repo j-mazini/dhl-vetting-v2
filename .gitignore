@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Testing
+.nyc_output/
+coverage/
+
+# Misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Cache
+.cache/
+cache-build/
+
+# Documents (non-code)
+*.pdf
+*.docx
+documentos/
+ALTERACOES_VETTING_PIPELINE.md
+COST_MODELS_EXPLAINED.md
+LANDING_PAGE_IMPROVEMENTS.md
+SUBMISSION_ERROR_FIX.md
+SUBMISSION_FIX_COMPLETE.md
+
+# Archive directories
+arquivo/
+.claude-octopus/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

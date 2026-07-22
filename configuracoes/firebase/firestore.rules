@@ -1,0 +1,271 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userEmail() {
+      return signedIn() && request.auth.token.email is string
+        ? request.auth.token.email
+        : '';
+    }
+
+    function isAdmin() {
+      return userEmail().matches('.*@baexpress\\.co\\.uk$');
+    }
+
+    function isOwnerByEmail() {
+      return signedIn()
+        && resource.data.email is string
+        && resource.data.email == userEmail();
+    }
+
+    function validDriverCreate() {
+      return request.resource.data.keys().hasOnly([
+        'personalInfo',
+        'rtw',
+        'dvla',
+        'fullName',
+        'email',
+        'phone',
+        'role',
+        'proposedRole',
+        'deliveryExperience',
+        'checklistDocs',
+        'prescreenFlags',
+        'applicationDeclaration',
+        'signature',
+        'currentStatus',
+        'source',
+        'createdAt',
+        'updatedAt',
+        'statusUpdatedAt'
+      ])
+      && request.resource.data.personalInfo is map
+      && request.resource.data.rtw is map
+      && request.resource.data.dvla is map
+      && request.resource.data.fullName is string
+      && request.resource.data.email is string
+      && request.resource.data.phone is string
+      && request.resource.data.personalInfo.fullName == request.resource.data.fullName
+      && request.resource.data.personalInfo.email == request.resource.data.email
+      && request.resource.data.personalInfo.phone == request.resource.data.phone
+      // Apply flow lands in PENDING_SIGNATURE (DocuSign e-signature by email).
+      // PRE_REGISTERED kept for backward compatibility.
+      && request.resource.data.currentStatus in ['PENDING_SIGNATURE', 'PRE_REGISTERED']
+      && request.resource.data.source == 'apply_page';
+    }
+
+    function onlyChecklistDriverUpdate() {
+      return isOwnerByEmail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checklistChecks',
+          'updatedAt'
+        ])
+        && request.resource.data.checklistChecks is list;
+    }
+
+    function onlyLegacyChecklistUpdate() {
+      return isOwnerByEmail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checks',
+          'updatedAt'
+        ])
+        && request.resource.data.checks is list;
+    }
+
+    // Applicant-filled work history: the driver may edit ONLY
+    // checklistDocs.work_history (+updatedAt) on their own record, and only
+    // after the interview stage or an explicit admin release
+    // (checklistDocs.work_history_released == true).
+    function workHistoryChangeOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checklistDocs',
+          'updatedAt'
+        ])
+        && request.resource.data.checklistDocs
+          .diff(resource.data.get('checklistDocs', {}))
+          .affectedKeys()
+          .hasOnly(['work_history']);
+    }
+
+    function workHistoryUnlocked() {
+      return resource.data.get(['checklistDocs', 'work_history_released'], false) == true
+        || resource.data.get('currentStatus', '') in [
+          'INTERVIEW_PASSED', 'SUITABILITY_APPROVED',
+          'DOCUMENTS_REQUESTED', 'DOCUMENTS_SUBMITTED',
+          'VETTING_IN_PROGRESS', 'VRA_REQUIRED', 'VRA_APPROVED',
+          'DHL_SUBMITTED', 'DHL_APPROVED', 'VAN_HIRE_IN_PROGRESS',
+          'TRAINING_IN_PROGRESS', 'APPROVED', 'ACTIVE'
+        ];
+    }
+
+    function onlyWorkHistoryDriverUpdate() {
+      return isOwnerByEmail() && workHistoryChangeOnly() && workHistoryUnlocked();
+    }
+
+    function isNotificationOwner() {
+      return signedIn()
+        && resource.data.driverId is string
+        && (
+          (
+            exists(/databases/$(database)/documents/drivers/$(resource.data.driverId))
+            && get(/databases/$(database)/documents/drivers/$(resource.data.driverId)).data.email == userEmail()
+          )
+          || (
+            exists(/databases/$(database)/documents/workspaces/ba-express-vetting/vendors/$(resource.data.driverId))
+            && get(/databases/$(database)/documents/workspaces/ba-express-vetting/vendors/$(resource.data.driverId)).data.email == userEmail()
+          )
+        );
+    }
+
+    function onlyMarkOwnNotificationRead() {
+      return isNotificationOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'readBy',
+          'readAt'
+        ])
+        && request.resource.data.readBy == true;
+    }
+
+    match /drivers/{driverId} {
+      allow create: if validDriverCreate();
+      allow get: if isAdmin() || isOwnerByEmail();
+      allow list: if isAdmin() || isOwnerByEmail();
+      allow update: if isAdmin() || onlyChecklistDriverUpdate() || onlyWorkHistoryDriverUpdate();
+      allow delete: if isAdmin();
+
+      match /auditLog/{entryId} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    match /firstAccessCodes/{emailKey} {
+      allow get: if true;
+      allow list: if false;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (
+          signedIn()
+          && resource.data.email == userEmail()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'consumedAt',
+            'uid'
+          ])
+        );
+    }
+
+    match /workspaces/{workspaceId}/vendors/{vendorId} {
+      allow get, list: if isAdmin() || isOwnerByEmail();
+      allow update: if isAdmin()
+        || onlyLegacyChecklistUpdate()
+        || (isOwnerByEmail() && workHistoryChangeOnly());
+      allow create, delete: if isAdmin();
+
+      match /auditLog/{entryId} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    match /stateTransitions/{transitionId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /applications/{applicationId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /documents/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /candidate_notifications/{notificationId} {
+      allow read: if isAdmin() || isNotificationOwner();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || onlyMarkOwnNotificationRead();
+    }
+
+    match /auditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /emailsSent/{emailId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /dhlSubmissions/{submissionId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Candidate knowledge assessments. The {token} doc id is an unguessable
+    // capability granting a single candidate access to their own test — no login.
+    // Candidates may only advance their own progress; the score and questions are
+    // never candidate-writable. Admins manage release/reset and scoring.
+    function onlyCandidateAssessmentUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'answers',
+          'currentIndex',
+          'status',
+          'startedAt',
+          'completedAt',
+          'updatedAt'
+        ])
+        // a finished assessment is locked — no further candidate edits
+        && resource.data.status != 'completed'
+        && request.resource.data.status in ['released', 'in_progress', 'completed']
+        // completing requires every released question to be answered
+        && (
+          request.resource.data.status != 'completed'
+          || request.resource.data.answers.size() == resource.data.totalQuestions
+        );
+    }
+
+    match /assessments/{token} {
+      allow get: if true;                 // capability via unguessable token
+      allow list: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || onlyCandidateAssessmentUpdate();
+    }
+
+    // HR-managed invitation links for email-based driver onboarding.
+    // Single-use tokens: once `used` is true, no further changes allowed.
+    match /invitationLinks/{code} {
+      // Anyone can READ a link (to validate before starting vetting).
+      // But validation must also occur server-side in Cloud Function.
+      allow get: if true;
+      allow list: if false;               // prevent enumeration
+
+      // Only admins create/delete links
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly([
+          'code',
+          'email',
+          'used',
+          'usedAt',
+          'createdAt',
+          'createdBy',
+          'status'
+        ])
+        && request.resource.data.code is string
+        && request.resource.data.email is string
+        && request.resource.data.used == false
+        && request.resource.data.usedAt == null
+        && request.resource.data.createdAt is number
+        && request.resource.data.createdBy is string
+        && request.resource.data.status == 'pending';
+
+      // Only admins can delete links
+      allow delete: if isAdmin();
+
+      // Only admins can update, AND only before first use
+      // Once used=true, link is immutable (prevents tampering)
+      allow update: if isAdmin()
+        && resource.data.used == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status'
+        ]);
+    }
+  }
+}

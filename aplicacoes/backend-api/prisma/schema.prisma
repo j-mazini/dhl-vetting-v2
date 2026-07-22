@@ -1,0 +1,280 @@
+// Vetting 2.0 System Database Schema
+// PostgreSQL with Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ====================================
+// CORE ENTITIES
+// ====================================
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  googleId  String?  @unique
+  fullName  String
+  role      UserRole @default(USER)
+
+  // Relations
+  createdApplications  Application[]
+  auditLogs            AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+model Driver {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?
+  fullName  String
+  dateOfBirth DateTime?
+  address   String?
+
+  // Right to Work (RTW)
+  rtwDocumentType String?      // BRITISH_PASSPORT, EU_PASSPORT, SHARE_CODE, SPONSOR_VISA, OTHER
+  rtwDocumentNumber String?
+  rtwExpirationDate DateTime?
+
+  // DVLA (Driving License)
+  dvlaType String?              // BRITISH, EU, OTHER
+  dvlaNumber String?
+  dvlaExpirationDate DateTime?
+
+  // Insurance
+  insuranceNumber String?
+  insuranceStatus String? @default("PENDING")  // PENDING, APPROVED, DECLINED
+
+  // Experience
+  yearsOfExperience Int?
+
+  // Status Machine
+  currentStatus String @default("PRE_REGISTERED")  // 34 states
+
+  // Relations
+  applications      Application[]
+  documents         Document[]
+  stateTransitions  StateTransition[]
+  emailsSent        EmailSent[]
+  dhlIntegration    DhlIntegration?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([currentStatus])
+  @@index([createdAt])
+}
+
+// ====================================
+// APPLICATION FLOW
+// ====================================
+
+model Application {
+  id        String   @id @default(uuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  // Interview
+  interviewDate DateTime?
+  interviewNotes String?
+  englishAssessmentScore Int?
+  mathAssessmentScore Int?
+  trafficKnowledgeScore Int?
+
+  // Suitability Assessment
+  suitabilityAssessmentScore Int?
+  suitabilityAssessmentNotes String?
+  suitabilityAssessmentUrl String?
+
+  // Vetting
+  vettingStatus String @default("PENDING")  // PENDING, VRA_REQUIRED, APPROVED, REJECTED
+  vraDocumentUrl String?
+  vraNotes String?
+
+  // DHL
+  dhlStatus String @default("PENDING")    // PENDING, APPROVED, REJECTED, AUTO_CHASE_D3
+  dhlSentDate DateTime?
+  dhlResponseDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([driverId])
+  @@index([vettingStatus])
+  @@index([dhlStatus])
+  @@index([interviewDate])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  documentType String                // RTW, DVLA, DBS, CRC, WORK_REFERENCE, OTHER
+  documentUrl String                 // Cloud Storage path
+  uploadDate DateTime @default(now())
+  expirationDate DateTime?
+
+  verificationStatus String @default("PENDING")  // PENDING, VERIFIED, REJECTED
+  verifiedBy String?
+  verifiedDate DateTime?
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([driverId])
+  @@index([documentType])
+  @@index([verificationStatus])
+  @@index([expirationDate])
+}
+
+// ====================================
+// STATE MANAGEMENT & AUDIT
+// ====================================
+
+model StateTransition {
+  id        String   @id @default(uuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  fromState String
+  toState String
+  action String?                      // APPLY, PASS_PRESCREEN, AUTO_REJECT, etc
+
+  triggeredBy String @default("SYSTEM")  // SYSTEM, USER, ADMIN
+  triggeredByUserId String?
+
+  transitionDate DateTime @default(now())
+  reason String?
+
+  createdAt DateTime @default(now())
+
+  @@index([driverId])
+  @@index([transitionDate])
+  @@index([fromState])
+  @@index([toState])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  action String                      // CREATE_APPLICATION, UPDATE_STATUS, etc
+  entityType String                  // DRIVER, APPLICATION, DOCUMENT, etc
+  entityId String
+
+  oldValues String?                  // JSON
+  newValues String?                  // JSON
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityId])
+  @@index([createdAt])
+}
+
+// ====================================
+// EMAIL & COMMUNICATIONS
+// ====================================
+
+model EmailSent {
+  id        String   @id @default(uuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  emailType String                   // PREREGISTRATION_CONFIRMATION, APPROVAL_INITIAL, etc
+  recipientEmail String
+  sentDate DateTime @default(now())
+  status String @default("SENT")     // SENT, OPENED, BOUNCED, COMPLAINED
+
+  templateId String?
+  templateData String?               // JSON
+
+  sendgridMessageId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([driverId])
+  @@index([emailType])
+  @@index([status])
+}
+
+// ====================================
+// DHL INTEGRATION
+// ====================================
+
+model DhlIntegration {
+  id        String   @id @default(uuid())
+  driverId  String   @unique
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  submissionDate DateTime?
+  formData String?                   // JSON: auto-populated DHL form
+  response String?                   // JSON: DHL response
+
+  autoChaseDate DateTime?
+  autoChaseCount Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([driverId])
+  @@index([submissionDate])
+}
+
+// ====================================
+// WEBHOOKS & INTEGRATIONS
+// ====================================
+
+model WebhookEvent {
+  id        String   @id @default(uuid())
+
+  eventType String                  // sendgrid.bounce, dhl.response, etc
+  source String                     // SENDGRID, DHL, etc
+  payload String                    // JSON
+
+  processed Boolean @default(false)
+  processedAt DateTime?
+  error String?
+
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([processed])
+  @@index([createdAt])
+}
+
+// ====================================
+// ENUMS
+// ====================================
+
+enum UserRole {
+  ADMIN
+  VETTING_OFFICER
+  INTERVIEW_CONDUCTOR
+  USER
+}
+
+// ====================================
+// INDEXES FOR PERFORMANCE
+// ====================================
+
+// Note: Additional indexes can be created based on query patterns observed in production

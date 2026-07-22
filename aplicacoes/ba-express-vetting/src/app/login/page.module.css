@@ -1,0 +1,165 @@
+.page {
+  @apply min-h-screen bg-gray-50 flex flex-col;
+}
+
+.loadingPage {
+  @apply min-h-screen bg-gray-50 flex items-center justify-center;
+}
+
+.spinner {
+  @apply w-6 h-6 border-2 border-brand-red border-t-transparent rounded-full animate-spin;
+}
+
+/* ── Navbar ── */
+.header {
+  @apply flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200;
+}
+
+.brand {
+  @apply flex items-center gap-3;
+}
+
+.brandName {
+  @apply text-gray-900 font-bold tracking-wide;
+}
+
+.nav {
+  @apply hidden md:flex items-center gap-8 text-sm text-gray-500 font-medium;
+}
+
+.navLink {
+  @apply hover:text-gray-900 transition-colors;
+}
+
+/* ── Main layout ── */
+.main {
+  @apply flex-1 flex items-center max-w-7xl mx-auto w-full px-8 gap-16 py-16;
+}
+
+/* ── Left — hero copy ── */
+.hero {
+  @apply hidden lg:flex flex-col flex-1;
+}
+
+.eyebrow {
+  @apply flex items-center gap-2 mb-6;
+}
+
+.eyebrowLine {
+  @apply w-8 h-0.5 bg-brand-red;
+}
+
+.eyebrowText {
+  @apply text-brand-red text-xs font-bold uppercase tracking-widest;
+}
+
+.heroTitle {
+  @apply text-5xl xl:text-6xl font-black text-gray-900 uppercase leading-tight tracking-tight mb-6;
+}
+
+.heroAccent {
+  @apply text-brand-red;
+}
+
+.heroSub {
+  @apply text-gray-500 text-sm leading-relaxed max-w-xs;
+}
+
+/* ── Right — login card ── */
+.cardWrap {
+  @apply w-full max-w-sm flex-shrink-0 mx-auto lg:mx-0;
+}
+
+.card {
+  @apply bg-white border border-gray-200 rounded-lg p-8 shadow-sm;
+}
+
+.mobileLogo {
+  @apply lg:hidden flex justify-center mb-6;
+}
+
+.cardTitle {
+  @apply text-xl font-black text-gray-900 uppercase tracking-tight mb-1;
+}
+
+.cardSub {
+  @apply text-gray-400 text-sm mb-7;
+}
+
+.error {
+  @apply bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded mb-6;
+}
+
+/* ── Email / password form ── */
+.form {
+  @apply flex flex-col gap-4 mb-5;
+}
+
+.field {
+  @apply flex flex-col gap-1.5;
+}
+
+.label {
+  @apply text-gray-700 text-xs font-bold uppercase tracking-wide;
+}
+
+.input {
+  @apply w-full border border-gray-200 rounded px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-all focus:border-brand-red focus:ring-2 focus:ring-brand-red/10;
+}
+
+.primaryButton {
+  @apply w-full flex items-center justify-center gap-2 bg-brand-red text-white font-bold py-3.5 px-4 rounded hover:bg-brand-red-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide text-sm;
+}
+
+.toggleRow {
+  @apply text-center text-sm text-gray-500 mb-5;
+}
+
+.toggleLink {
+  @apply text-brand-red font-semibold hover:underline bg-transparent border-none cursor-pointer p-0;
+}
+
+.divider {
+  @apply flex items-center gap-3 my-5 text-gray-400 text-xs uppercase tracking-wide;
+}
+
+.dividerLine {
+  @apply flex-1 h-px bg-gray-200;
+}
+
+.googleButton {
+  @apply w-full flex items-center justify-center gap-3 bg-white border border-gray-200 text-gray-700 font-bold py-3.5 px-4 rounded hover:border-brand-red hover:text-brand-red transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide text-sm;
+}
+
+.buttonSpinner {
+  @apply w-4 h-4 border-2 border-white/40 border-t-transparent rounded-full animate-spin;
+}
+
+.applyButton {
+  @apply mt-3 w-full flex items-center justify-center bg-white border border-gray-200 text-gray-700 font-bold py-3 px-4 rounded hover:border-brand-red hover:text-brand-red transition-all uppercase tracking-wide text-sm;
+}
+
+/* ── Steps bar ── */
+.steps {
+  @apply bg-white border-t border-gray-200;
+}
+
+.stepsInner {
+  @apply max-w-7xl mx-auto px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-6;
+}
+
+.step {
+  @apply flex gap-3 items-start;
+}
+
+.stepNum {
+  @apply text-brand-red font-black text-base leading-none mt-0.5;
+}
+
+.stepLabel {
+  @apply text-gray-900 font-bold text-xs uppercase tracking-wide;
+}
+
+.stepDesc {
+  @apply text-gray-400 text-xs mt-0.5;
+}
