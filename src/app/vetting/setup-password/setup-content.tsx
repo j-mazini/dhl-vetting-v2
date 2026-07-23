@@ -61,7 +61,6 @@ export default function SetupPasswordContent() {
     setIsSubmitting(true);
 
     try {
-      // Validate passwords match
       if (password !== confirmPassword) {
         throw new Error('Passwords do not match');
       }
@@ -70,16 +69,13 @@ export default function SetupPasswordContent() {
         throw new Error('Password must be at least 8 characters long');
       }
 
-      // Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Update profile name if provided
       if (name) {
         await updateProfile(user, { displayName: name });
       }
 
-      // Mark invitation as used
       if (code) {
         await updateDoc(doc(db, 'invitationLinks', code), {
           used: true,
@@ -88,16 +84,12 @@ export default function SetupPasswordContent() {
         });
       }
 
-      // Update or create driver document
       const driverRef = doc(db, 'drivers', user.uid);
       await updateDoc(driverRef, {
         email: email.toLowerCase(),
         uid: user.uid,
         lastSignIn: Timestamp.now(),
       }).catch(async () => {
-        // If driver doc doesn't exist, create it
-        // This is a fallback - normally the driver should exist from the application
-        // But we can create a minimal one if needed
         await updateDoc(driverRef, {
           email: email.toLowerCase(),
           uid: user.uid,
@@ -105,7 +97,6 @@ export default function SetupPasswordContent() {
         });
       });
 
-      // Redirect to dashboard
       router.push('/vetting/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
