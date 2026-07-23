@@ -194,3 +194,16 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.forgotLink {
+  font-size: 12px;
+  color: #bf1d23;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgotLink:hover {
+  color: #a21820;
+  text-decoration: underline;
+}

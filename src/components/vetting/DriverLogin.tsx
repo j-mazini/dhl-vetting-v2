@@ -101,9 +101,14 @@ export function DriverLogin() {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="password" className={styles.label}>
-                Password
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="password" className={styles.label}>
+                  Password
+                </label>
+                <a href="/vetting/forgot-password" className={styles.forgotLink}>
+                  Forgot?
+                </a>
+              </div>
               <input
                 id="password"
                 type="password"
