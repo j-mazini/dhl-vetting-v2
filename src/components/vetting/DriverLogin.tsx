@@ -143,17 +143,6 @@ export function DriverLogin() {
 
         <div className={styles.footer}>
           <p>
-            Don't have a temporary password?{' '}
-            <button
-              type="button"
-              onClick={() => setShowFirstPassword(true)}
-              className={styles.link}
-              disabled={isLoading}
-            >
-              Get one here
-            </button>
-          </p>
-          <p>
             Don't have an account?{' '}
             <a href="/apply" className={styles.link}>
               Apply here
