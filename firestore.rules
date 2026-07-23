@@ -6,24 +6,31 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Helper function for admin check
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email != null &&
+             request.auth.token.email.endsWith('@baexpress.co.uk');
+    }
+
     // Drivers collection - admins can read
     match /drivers/{driverId} {
-      allow read: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      allow read: if isAdmin();
       allow write: if false;
     }
 
     // First access codes - admins can create and read
     match /firstAccessCodes/{emailKey} {
-      allow create: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
-      allow update: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      allow create: if isAdmin();
+      allow update: if isAdmin();
       allow read: if request.auth != null;
     }
 
     // Workspaces - admins only
     match /workspaces/{workspace} {
-      allow read, write: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      allow read, write: if isAdmin();
       match /vendors/{vendorId} {
-        allow read, write: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+        allow read, write: if isAdmin();
       }
     }
   }
