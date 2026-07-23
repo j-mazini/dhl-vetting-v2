@@ -1,37 +1,248 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default deny all
-    match /{document=**} {
-      allow read, write: if false;
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Helper function for admin check
+    function userEmail() {
+      return signedIn() && request.auth.token.email is string
+        ? request.auth.token.email
+        : '';
+    }
+
     function isAdmin() {
-      return request.auth != null &&
-             request.auth.token.email != null &&
-             request.auth.token.email.endsWith('@baexpress.co.uk');
+      return userEmail().matches('.*@baexpress\\.co\\.uk$');
     }
 
-    // Drivers collection - admins can read
+    function isOwnerByEmail() {
+      return signedIn()
+        && resource.data.email is string
+        && resource.data.email == userEmail();
+    }
+
+    function validDriverCreate() {
+      return request.resource.data.keys().hasOnly([
+        'personalInfo',
+        'rtw',
+        'dvla',
+        'fullName',
+        'email',
+        'phone',
+        'role',
+        'proposedRole',
+        'deliveryExperience',
+        'checklistDocs',
+        'prescreenFlags',
+        'applicationDeclaration',
+        'signature',
+        'currentStatus',
+        'source',
+        'createdAt',
+        'updatedAt',
+        'statusUpdatedAt'
+      ])
+      && request.resource.data.personalInfo is map
+      && request.resource.data.rtw is map
+      && request.resource.data.dvla is map
+      && request.resource.data.fullName is string
+      && request.resource.data.email is string
+      && request.resource.data.phone is string
+      && request.resource.data.personalInfo.fullName == request.resource.data.fullName
+      && request.resource.data.personalInfo.email == request.resource.data.email
+      && request.resource.data.personalInfo.phone == request.resource.data.phone
+      && request.resource.data.currentStatus in ['PENDING_SIGNATURE', 'PRE_REGISTERED']
+      && request.resource.data.source == 'apply_page';
+    }
+
+    function onlyChecklistDriverUpdate() {
+      return isOwnerByEmail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checklistChecks',
+          'updatedAt'
+        ])
+        && request.resource.data.checklistChecks is list;
+    }
+
+    function onlyLegacyChecklistUpdate() {
+      return isOwnerByEmail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checks',
+          'updatedAt'
+        ])
+        && request.resource.data.checks is list;
+    }
+
+    function workHistoryChangeOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checklistDocs',
+          'updatedAt'
+        ])
+        && request.resource.data.checklistDocs
+          .diff(resource.data.get('checklistDocs', {}))
+          .affectedKeys()
+          .hasOnly(['work_history']);
+    }
+
+    function workHistoryUnlocked() {
+      return resource.data.get(['checklistDocs', 'work_history_released'], false) == true
+        || resource.data.get('currentStatus', '') in [
+          'INTERVIEW_PASSED', 'SUITABILITY_APPROVED',
+          'DOCUMENTS_REQUESTED', 'DOCUMENTS_SUBMITTED',
+          'VETTING_IN_PROGRESS', 'VRA_REQUIRED', 'VRA_APPROVED',
+          'DHL_SUBMITTED', 'DHL_APPROVED', 'VAN_HIRE_IN_PROGRESS',
+          'TRAINING_IN_PROGRESS', 'APPROVED', 'ACTIVE'
+        ];
+    }
+
+    function onlyWorkHistoryDriverUpdate() {
+      return isOwnerByEmail() && workHistoryChangeOnly() && workHistoryUnlocked();
+    }
+
+    function isNotificationOwner() {
+      return signedIn()
+        && resource.data.driverId is string
+        && (
+          (
+            exists(/databases/$(database)/documents/drivers/$(resource.data.driverId))
+            && get(/databases/$(database)/documents/drivers/$(resource.data.driverId)).data.email == userEmail()
+          )
+          || (
+            exists(/databases/$(database)/documents/workspaces/ba-express-vetting/vendors/$(resource.data.driverId))
+            && get(/databases/$(database)/documents/workspaces/ba-express-vetting/vendors/$(resource.data.driverId)).data.email == userEmail()
+          )
+        );
+    }
+
+    function onlyMarkOwnNotificationRead() {
+      return isNotificationOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'readBy',
+          'readAt'
+        ])
+        && request.resource.data.readBy == true;
+    }
+
+    function onlyCandidateAssessmentUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'answers',
+          'currentIndex',
+          'status',
+          'startedAt',
+          'completedAt',
+          'updatedAt'
+        ])
+        && resource.data.status != 'completed'
+        && request.resource.data.status in ['released', 'in_progress', 'completed']
+        && (
+          request.resource.data.status != 'completed'
+          || request.resource.data.answers.size() == resource.data.totalQuestions
+        );
+    }
+
     match /drivers/{driverId} {
-      allow read: if isAdmin();
-      allow write: if false;
-    }
+      allow create: if validDriverCreate();
+      allow get: if isAdmin() || isOwnerByEmail();
+      allow list: if isAdmin();
+      allow update: if isAdmin() || onlyChecklistDriverUpdate() || onlyWorkHistoryDriverUpdate();
+      allow delete: if isAdmin();
 
-    // First access codes - admins can create and read
-    match /firstAccessCodes/{emailKey} {
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow read: if request.auth != null;
-    }
-
-    // Workspaces - admins only
-    match /workspaces/{workspace} {
-      allow read, write: if isAdmin();
-      match /vendors/{vendorId} {
+      match /auditLog/{entryId} {
         allow read, write: if isAdmin();
       }
+    }
+
+    match /firstAccessCodes/{emailKey} {
+      allow get: if true;
+      allow list: if false;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (
+          signedIn()
+          && resource.data.email == userEmail()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'consumedAt',
+            'uid'
+          ])
+        );
+    }
+
+    match /workspaces/{workspaceId}/vendors/{vendorId} {
+      allow get, list: if isAdmin() || isOwnerByEmail();
+      allow update: if isAdmin()
+        || onlyLegacyChecklistUpdate()
+        || (isOwnerByEmail() && workHistoryChangeOnly());
+      allow create, delete: if isAdmin();
+
+      match /auditLog/{entryId} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    match /stateTransitions/{transitionId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /applications/{applicationId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /documents/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /candidate_notifications/{notificationId} {
+      allow read: if isAdmin() || isNotificationOwner();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || onlyMarkOwnNotificationRead();
+    }
+
+    match /auditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /emailsSent/{emailId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /dhlSubmissions/{submissionId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /assessments/{token} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || onlyCandidateAssessmentUpdate();
+    }
+
+    match /invitationLinks/{code} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly([
+          'code',
+          'email',
+          'used',
+          'usedAt',
+          'createdAt',
+          'createdBy',
+          'status'
+        ])
+        && request.resource.data.code is string
+        && request.resource.data.email is string
+        && request.resource.data.used == false
+        && request.resource.data.usedAt == null
+        && request.resource.data.createdAt is number
+        && request.resource.data.createdBy is string
+        && request.resource.data.status == 'pending';
+      allow delete: if isAdmin();
+      allow update: if isAdmin()
+        && resource.data.used == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status'
+        ]);
     }
   }
 }
