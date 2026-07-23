@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Drivers collection - admins can read
+    match /drivers/{driverId} {
+      allow read: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      allow write: if false;
+    }
+
+    // First access codes - admins can create and read
+    match /firstAccessCodes/{emailKey} {
+      allow create: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      allow update: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      allow read: if request.auth != null;
+    }
+
+    // Workspaces - admins only
+    match /workspaces/{workspace} {
+      allow read, write: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      match /vendors/{vendorId} {
+        allow read, write: if request.auth.token.email.matches('.*@baexpress\\.co\\.uk');
+      }
+    }
+  }
+}

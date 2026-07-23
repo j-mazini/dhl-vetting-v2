@@ -1452,28 +1452,49 @@ export default function AdminChecklistPage() {
         throw new Error('Not authenticated');
       }
 
-      const idToken = await currentUser.getIdToken();
-      if (!idToken) {
-        throw new Error('Failed to get authentication token');
+      const userEmail = currentUser.email || '';
+      if (!userEmail.endsWith('@baexpress.co.uk')) {
+        throw new Error('Only admin users can generate first access codes');
       }
 
-      const response = await fetch('/api/admin/generate-first-access-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          email: selected.email,
-          expiresInHours: 24,
-        }),
+      // Generate password and salt
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const generateRandomString = (length: number) => {
+        let result = '';
+        for (let i = 0; i < length; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      };
+
+      const temporaryPassword = generateRandomString(12);
+      const salt = generateRandomString(16);
+
+      // Hash password
+      const encoder = new TextEncoder();
+      const data = encoder.encode(`${salt}:${temporaryPassword}`);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const codeHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+
+      // Normalize email key
+      const emailKey = selected.email.trim().toLowerCase().replace(/[^a-z0-9._%+-@]/g, '_');
+
+      // Calculate expiration
+      const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+
+      // Write directly to Firestore
+      const docRef = doc(db, 'firstAccessCodes', emailKey);
+      await setDoc(docRef, {
+        email: selected.email.toLowerCase(),
+        temporaryPassword,
+        salt,
+        codeHash,
+        expiresAt: new Date(expiresAt),
+        createdAt: new Date(),
+        consumedAt: null,
+        uid: null,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate code');
-      }
 
       setGeneratedPasswordResult({
         email: data.email,
