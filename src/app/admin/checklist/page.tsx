@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AdminNavbar } from '@/components/admin/AdminNavbar';
 import { useAdminCandidate } from '@/components/admin/AdminCandidateContext';
+import { auth } from '@/lib/firebase';
 import { CaseRegistrationPanel, type CaseRegistrationField } from './components/CaseRegistrationPanel';
 import { ExportActions } from './components/ExportActions';
 import { ChecklistRow, type AdminWorkHistoryEntry } from './components/ChecklistRow';
@@ -1446,7 +1447,12 @@ export default function AdminChecklistPage() {
     setGeneratedPasswordResult(null);
 
     try {
-      const idToken = await (user as any).getIdToken?.();
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('Not authenticated');
+      }
+
+      const idToken = await currentUser.getIdToken();
       if (!idToken) {
         throw new Error('Failed to get authentication token');
       }
@@ -1479,7 +1485,7 @@ export default function AdminChecklistPage() {
     } finally {
       setGeneratePasswordLoading(false);
     }
-  }, [selected, user]);
+  }, [selected]);
 
   const progress = completion(selected);
   const applicationLocked = selected?.applicationRejected === true;
