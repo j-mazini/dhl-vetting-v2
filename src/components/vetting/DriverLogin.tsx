@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { SetFirstPassword } from './SetFirstPassword';
 import styles from './DriverLogin.module.css';
 
 export function DriverLogin() {
@@ -12,6 +13,7 @@ export function DriverLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showFirstPassword, setShowFirstPassword] = useState(false);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +47,10 @@ export function DriverLogin() {
   };
 
   const isLoading = loading || isSubmitting;
+
+  if (showFirstPassword) {
+    return <SetFirstPassword onBack={() => setShowFirstPassword(false)} />;
+  }
 
   return (
     <div className={styles.container}>
@@ -124,12 +130,25 @@ export function DriverLogin() {
           </form>
         </div>
 
-        <p className={styles.footer}>
-          Don't have an account?{' '}
-          <a href="/apply" className={styles.link}>
-            Apply here
-          </a>
-        </p>
+        <div className={styles.footer}>
+          <p>
+            Got a temporary password?{' '}
+            <button
+              type="button"
+              onClick={() => setShowFirstPassword(true)}
+              className={styles.link}
+              disabled={isLoading}
+            >
+              Set your password here
+            </button>
+          </p>
+          <p>
+            Don't have an account?{' '}
+            <a href="/apply" className={styles.link}>
+              Apply here
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
