@@ -87,9 +87,9 @@ export async function POST(request: NextRequest) {
     const existingRef = db.collection('firstAccessCodes').doc(emailKey);
     const existingSnap = await existingRef.get();
 
-    if (existingSnap.exists()) {
+    if (existingSnap.exists) {
       const existingData = existingSnap.data();
-      if (!existingData.consumedAt) {
+      if (existingData && !existingData.consumedAt) {
         return NextResponse.json(
           { error: 'A first access code already exists for this email. Please use the existing code or wait for it to expire.' },
           { status: 409 },
