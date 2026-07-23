@@ -3,11 +3,16 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeAdmin } from '@/lib/firebase-admin';
 
-// Initialize Firebase Admin
-initializeAdmin();
+let db: ReturnType<typeof getFirestore>;
+let auth: ReturnType<typeof getAuth>;
 
-const db = getFirestore();
-const auth = getAuth();
+function ensureAdminInitialized() {
+  if (!db || !auth) {
+    initializeAdmin();
+    db = getFirestore();
+    auth = getAuth();
+  }
+}
 
 function normaliseFirstAccessEmailKey(email: string) {
   return email.trim().toLowerCase().replace(/[^a-z0-9._%+-@]/g, '_');
@@ -32,6 +37,8 @@ async function sha256(value: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
+    ensureAdminInitialized();
+
     const { email, expiresInHours = 24 } = await request.json();
 
     // Validate input
