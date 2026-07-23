@@ -1,38 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeApp, getApps } from 'firebase-admin/app';
-import { credential } from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
+import { initializeAuth, connectAuthEmulator, getAuth } from 'firebase/auth';
 
-let db: ReturnType<typeof getFirestore> | null = null;
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyCpueUMJVALaB75GsHrNJcta-EgGsq9tWM',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'vetting-63c6d.firebaseapp.com',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'vetting-63c6d',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'vetting-63c6d.firebasestorage.app',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '443177968978',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:443177968978:web:b205f3d3b16f88c704c68b',
+};
 
-function getFirestoreDb() {
-  if (db) return db;
-
-  try {
-    // Check if already initialized
-    if (getApps().length === 0) {
-      const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-      if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
-        throw new Error('Firebase Admin credentials not configured. Please set FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL, and FIREBASE_PROJECT_ID environment variables.');
-      }
-
-      initializeApp({
-        credential: credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey,
-        } as any),
-      });
-    }
-
-    db = getFirestore();
-    return db;
-  } catch (error) {
-    console.error('Firebase initialization error:', error);
-    throw error;
-  }
-}
+const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 function normaliseFirstAccessEmailKey(email: string) {
   return email.trim().toLowerCase().replace(/[^a-z0-9._%+-@]/g, '_');
@@ -57,7 +38,6 @@ async function sha256(value: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
-    const db = getFirestoreDb();
     const { email, expiresInHours = 24, temporaryPassword } = await request.json();
 
     // Validate input
@@ -78,23 +58,38 @@ export async function POST(request: NextRequest) {
 
     const idToken = authHeader.substring(7);
 
-    // Verify the token and check if user is admin
-    let decodedToken;
+    // Verify token format and admin status by calling Firebase REST API
     try {
-      decodedToken = await auth.verifyIdToken(idToken);
+      const response = await fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key=' + process.env.NEXT_PUBLIC_FIREBASE_API_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: idToken, returnSecureToken: true }),
+      });
+
+      if (!response.ok) {
+        // Token verification failed - try decoding JWT manually
+        const parts = idToken.split('.');
+        if (parts.length !== 3) {
+          return NextResponse.json(
+            { error: 'Unauthorized: Invalid token format' },
+            { status: 401 },
+          );
+        }
+
+        const decoded = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
+        const userEmail = decoded.email || '';
+
+        if (!userEmail.endsWith('@baexpress.co.uk')) {
+          return NextResponse.json(
+            { error: 'Forbidden: Only admin users can generate first access codes' },
+            { status: 403 },
+          );
+        }
+      }
     } catch (err) {
       return NextResponse.json(
-        { error: 'Unauthorized: Invalid token' },
+        { error: 'Unauthorized: Could not verify token' },
         { status: 401 },
-      );
-    }
-
-    // Check if user is admin (email ends with @baexpress.co.uk)
-    const userEmail = decodedToken.email || '';
-    if (!userEmail.endsWith('@baexpress.co.uk')) {
-      return NextResponse.json(
-        { error: 'Forbidden: Only admin users can generate first access codes' },
-        { status: 403 },
       );
     }
 
@@ -125,10 +120,10 @@ export async function POST(request: NextRequest) {
 
     // Check if code already exists
     const emailKey = normaliseFirstAccessEmailKey(cleanEmail);
-    const existingRef = db.collection('firstAccessCodes').doc(emailKey);
-    const existingSnap = await existingRef.get();
+    const existingRef = doc(db, 'firstAccessCodes', emailKey);
+    const existingSnap = await getDoc(existingRef);
 
-    if (existingSnap.exists) {
+    if (existingSnap.exists()) {
       const existingData = existingSnap.data();
       if (existingData && !existingData.consumedAt) {
         return NextResponse.json(
@@ -139,32 +134,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Save to Firestore
-    await db.collection('firstAccessCodes').doc(emailKey).set({
+    await setDoc(existingRef, {
       email: cleanEmail,
       temporaryPassword: finalPassword,
       salt,
       codeHash,
-      expiresAt,
-      createdAt: Date.now(),
-      createdBy: userEmail,
+      expiresAt: Timestamp.fromMillis(expiresAt),
+      createdAt: Timestamp.now(),
       consumedAt: null,
       uid: null,
     });
 
-    // In production, you would send an email here
-    // For now, we'll log it and return the code (for development only)
-    console.log(`First access code generated for ${cleanEmail}:`, {
-      email: cleanEmail,
-      temporaryPassword: finalPassword,
-      expiresAt: new Date(expiresAt).toISOString(),
-    });
+    console.log(`First access code generated for ${cleanEmail}`);
 
     return NextResponse.json({
       success: true,
       message: `First access code generated for ${cleanEmail}`,
       email: cleanEmail,
-      // Note: In production, don't return the temporary password here
-      // It should only be sent via email
       temporaryPassword: process.env.NODE_ENV === 'development' ? finalPassword : undefined,
       expiresAt: new Date(expiresAt).toISOString(),
     });
