@@ -397,7 +397,8 @@ export default function AdminChecklistPage() {
   const [generatedPasswordResult, setGeneratedPasswordResult] = useState<{
     email: string;
     temporaryPassword?: string;
-    expiresAt: string;
+    expiresAt?: string;
+    message?: string;
   } | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
