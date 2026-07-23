@@ -1,26 +1,16 @@
 'use client';
 
-import { Suspense } from 'react';
-import SetupPasswordContent from './setup-content';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { auth, db } from '@/lib/firebase';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import styles from './page.module.css';
 
-export default function SetupPasswordPage() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SetupPasswordContent />
-    </Suspense>
-  );
-}
-
-function LoadingFallback() {
-  return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <p>Validating invitation...</p>
-      </div>
-    </div>
-  );
-}
+export default function SetupPasswordContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const code = searchParams.get('code');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
