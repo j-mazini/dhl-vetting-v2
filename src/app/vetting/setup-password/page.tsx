@@ -1,16 +1,6 @@
-'use client';
-
 import { Suspense } from 'react';
 import SetupPasswordContent from './setup-content';
 import styles from './page.module.css';
-
-export default function SetupPasswordPage() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SetupPasswordContent />
-    </Suspense>
-  );
-}
 
 function LoadingFallback() {
   return (
@@ -19,6 +9,14 @@ function LoadingFallback() {
         <p>Validating invitation...</p>
       </div>
     </div>
+  );
+}
+
+export default function SetupPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SetupPasswordContent />
+    </Suspense>
   );
 }
 
