@@ -13,7 +13,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AdminNavbar } from '@/components/admin/AdminNavbar';
-import { GeneratePasswordModal } from '@/components/admin/GeneratePasswordModal';
 import { useAdminCandidate } from '@/components/admin/AdminCandidateContext';
 import { CaseRegistrationPanel, type CaseRegistrationField } from './components/CaseRegistrationPanel';
 import { ExportActions } from './components/ExportActions';
@@ -393,7 +392,13 @@ export default function AdminChecklistPage() {
   const [notesDrafts, setNotesDrafts] = useState<Record<string, string>>({});
   // internal rejection notes draft — keyed by candidateId
   const [rejectionNotesDrafts, setRejectionNotesDrafts] = useState<Record<string, string>>({});
-  const [showGeneratePassword, setShowGeneratePassword] = useState(false);
+  const [generatePasswordLoading, setGeneratePasswordLoading] = useState(false);
+  const [generatedPasswordResult, setGeneratedPasswordResult] = useState<{
+    email: string;
+    temporaryPassword?: string;
+    expiresAt: string;
+  } | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   useEffect(() => {
     const candidateId = new URLSearchParams(window.location.search).get('candidate');
@@ -407,7 +412,8 @@ export default function AdminChecklistPage() {
     setApplicationHoldReason('');
     setCopiedMessageSlot(null);
     setOpenStepBlocks({});
-    setShowGeneratePassword(false);
+    setGeneratedPasswordResult(null);
+    setPasswordError(null);
   }, [selectedId]);
 
   useEffect(() => {
@@ -1429,6 +1435,52 @@ export default function AdminChecklistPage() {
     }
   }, [selected, auditActor]);
 
+  const handleGeneratePassword = useCallback(async () => {
+    if (!selected?.email) {
+      setPasswordError('No email available');
+      return;
+    }
+
+    setGeneratePasswordLoading(true);
+    setPasswordError(null);
+    setGeneratedPasswordResult(null);
+
+    try {
+      const idToken = await (user as any).getIdToken?.();
+      if (!idToken) {
+        throw new Error('Failed to get authentication token');
+      }
+
+      const response = await fetch('/api/admin/generate-first-access-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          email: selected.email,
+          expiresInHours: 24,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate code');
+      }
+
+      setGeneratedPasswordResult({
+        email: data.email,
+        temporaryPassword: data.temporaryPassword,
+        expiresAt: data.expiresAt,
+      });
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setGeneratePasswordLoading(false);
+    }
+  }, [selected, user]);
+
   const progress = completion(selected);
   const applicationLocked = selected?.applicationRejected === true;
 
@@ -1524,21 +1576,38 @@ export default function AdminChecklistPage() {
             ) : (
               <>
                 <div className={styles.panelHeader}>
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <p className={styles.panelKicker}>Selected candidate</p>
                     <h2 className={styles.panelTitle}>{selected.name}</h2>
                     <p className={styles.panelSub}>
                       {selected.email || 'No email'} · status {selected.status}
                     </p>
+                    {generatedPasswordResult && (
+                      <div className={styles.passwordResult}>
+                        <small style={{ color: '#15803d', fontWeight: 600 }}>✓ Password generated</small>
+                        <div style={{ fontSize: '12px', fontFamily: 'monospace', marginTop: '4px' }}>
+                          {generatedPasswordResult.temporaryPassword}
+                        </div>
+                        <small style={{ color: '#6b7280', display: 'block', marginTop: '4px' }}>
+                          Expires: {new Date(generatedPasswordResult.expiresAt).toLocaleString()}
+                        </small>
+                      </div>
+                    )}
+                    {passwordError && (
+                      <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                        Error: {passwordError}
+                      </div>
+                    )}
                   </div>
                   <div className={styles.panelActions}>
                     <button
                       type="button"
                       className={styles.generatePasswordBtn}
-                      onClick={() => setShowGeneratePassword(true)}
+                      onClick={handleGeneratePassword}
+                      disabled={generatePasswordLoading}
                       title="Generate temporary password for driver"
                     >
-                      🔑 Password
+                      {generatePasswordLoading ? '...' : '🔑'}
                     </button>
                     <div className={styles.progressBadge}>
                       <span>{progress.percent}%</span>
@@ -2037,12 +2106,6 @@ export default function AdminChecklistPage() {
           </div>
         )}
       </main>
-
-      <GeneratePasswordModal
-        isOpen={showGeneratePassword}
-        candidateEmail={selected?.email}
-        onClose={() => setShowGeneratePassword(false)}
-      />
     </div>
   );
 }
