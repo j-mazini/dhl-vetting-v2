@@ -1,16 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
+import { initializeApp, getApps } from 'firebase-admin/app';
+import { credential } from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { initializeAdmin } from '@/lib/firebase-admin';
 
-let db: ReturnType<typeof getFirestore>;
-let auth: ReturnType<typeof getAuth>;
+let db: ReturnType<typeof getFirestore> | null = null;
 
-function ensureAdminInitialized() {
-  if (!db || !auth) {
-    initializeAdmin();
+function getFirestoreDb() {
+  if (db) return db;
+
+  try {
+    // Check if already initialized
+    if (getApps().length === 0) {
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+      if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
+        throw new Error('Firebase Admin credentials not configured. Please set FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL, and FIREBASE_PROJECT_ID environment variables.');
+      }
+
+      initializeApp({
+        credential: credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey,
+        } as any),
+      });
+    }
+
     db = getFirestore();
-    auth = getAuth();
+    return db;
+  } catch (error) {
+    console.error('Firebase initialization error:', error);
+    throw error;
   }
 }
 
@@ -37,8 +57,7 @@ async function sha256(value: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminInitialized();
-
+    const db = getFirestoreDb();
     const { email, expiresInHours = 24, temporaryPassword } = await request.json();
 
     // Validate input
