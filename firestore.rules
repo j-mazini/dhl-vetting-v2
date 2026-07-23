@@ -244,5 +244,16 @@ service cloud.firestore {
           'status'
         ]);
     }
+
+    match /passwordResetTokens/{code} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if true;
+      allow update: if !resource.data.used
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'used',
+          'usedAt'
+        ]);
+    }
   }
 }

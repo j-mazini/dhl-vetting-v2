@@ -2,8 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { auth } from '@/lib/firebase';
-import { sendPasswordResetEmail } from 'firebase/auth';
 import styles from './page.module.css';
 
 export default function ForgotPasswordPage() {
@@ -23,16 +21,23 @@ export default function ForgotPasswordPage() {
         throw new Error('Please enter your email address');
       }
 
-      await sendPasswordResetEmail(auth, email);
+      const response = await fetch('/api/driver/send-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send reset link');
+      }
+
       setSuccess(true);
       setEmail('');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send reset email';
-      setError(
-        errorMessage.includes('user-not-found')
-          ? 'No account found with this email'
-          : errorMessage,
-      );
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send reset link';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
