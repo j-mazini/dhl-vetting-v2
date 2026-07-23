@@ -55,10 +55,10 @@ export function EnhancedHeroSection() {
             </m.p>
 
             <m.div className={styles.actions} variants={itemVariants}>
-              <AnimatedButton variant="primary" size="lg">
+              <AnimatedButton variant="primary" size="lg" href="/vetting/register">
                 Apply to Drive
               </AnimatedButton>
-              <AnimatedButton variant="secondary" size="lg">
+              <AnimatedButton variant="secondary" size="lg" href="#features">
                 Learn More
               </AnimatedButton>
             </m.div>
