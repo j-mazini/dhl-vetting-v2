@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AdminNavbar } from '@/components/admin/AdminNavbar';
+import { GeneratePasswordModal } from '@/components/admin/GeneratePasswordModal';
 import { useAdminCandidate } from '@/components/admin/AdminCandidateContext';
 import { CaseRegistrationPanel, type CaseRegistrationField } from './components/CaseRegistrationPanel';
 import { ExportActions } from './components/ExportActions';
@@ -392,6 +393,8 @@ export default function AdminChecklistPage() {
   const [notesDrafts, setNotesDrafts] = useState<Record<string, string>>({});
   // internal rejection notes draft — keyed by candidateId
   const [rejectionNotesDrafts, setRejectionNotesDrafts] = useState<Record<string, string>>({});
+  const [showGeneratePassword, setShowGeneratePassword] = useState(false);
+
   useEffect(() => {
     const candidateId = new URLSearchParams(window.location.search).get('candidate');
     if (candidateId) setSelectedId(candidateId);
@@ -1527,11 +1530,21 @@ export default function AdminChecklistPage() {
                       {selected.email || 'No email'} · status {selected.status}
                     </p>
                   </div>
-                  <div className={styles.progressBadge}>
-                    <span>{progress.percent}%</span>
-                    <small>
-                      {progress.done}/{progress.total}
-                    </small>
+                  <div className={styles.panelActions}>
+                    <button
+                      type="button"
+                      className={styles.generatePasswordBtn}
+                      onClick={() => setShowGeneratePassword(true)}
+                      title="Generate temporary password for driver"
+                    >
+                      🔑 Password
+                    </button>
+                    <div className={styles.progressBadge}>
+                      <span>{progress.percent}%</span>
+                      <small>
+                        {progress.done}/{progress.total}
+                      </small>
+                    </div>
                   </div>
                 </div>
 
@@ -2023,6 +2036,12 @@ export default function AdminChecklistPage() {
           </div>
         )}
       </main>
+
+      <GeneratePasswordModal
+        isOpen={showGeneratePassword}
+        candidateEmail={selected?.email}
+        onClose={() => setShowGeneratePassword(false)}
+      />
     </div>
   );
 }

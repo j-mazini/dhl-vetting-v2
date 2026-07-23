@@ -148,11 +148,6 @@ export function DriverLogin() {
               Apply here
             </a>
           </p>
-          <p className={styles.adminLink}>
-            <a href="/admin/first-access" className={styles.adminButton}>
-              🔑 Generate Temporary Password
-            </a>
-          </p>
         </div>
       </div>
 
