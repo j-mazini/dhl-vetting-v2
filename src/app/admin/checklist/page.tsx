@@ -407,6 +407,7 @@ export default function AdminChecklistPage() {
     setApplicationHoldReason('');
     setCopiedMessageSlot(null);
     setOpenStepBlocks({});
+    setShowGeneratePassword(false);
   }, [selectedId]);
 
   useEffect(() => {
