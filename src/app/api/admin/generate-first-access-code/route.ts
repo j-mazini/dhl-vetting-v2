@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   try {
     ensureAdminInitialized();
 
-    const { email, expiresInHours = 24 } = await request.json();
+    const { email, expiresInHours = 24, temporaryPassword } = await request.json();
 
     // Validate input
     if (!email || typeof email !== 'string') {
@@ -80,11 +80,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate temporary password and salt
-    const temporaryPassword = generateRandomString(12);
+    let finalPassword: string;
+
+    if (temporaryPassword) {
+      // Validate manual password
+      if (typeof temporaryPassword !== 'string' || temporaryPassword.length < 6) {
+        return NextResponse.json(
+          { error: 'Temporary password must be at least 6 characters long' },
+          { status: 400 },
+        );
+      }
+      finalPassword = temporaryPassword;
+    } else {
+      // Auto-generate password
+      finalPassword = generateRandomString(12);
+    }
+
     const salt = generateRandomString(16);
 
     // Create hash
-    const codeHash = await sha256(`${salt}:${temporaryPassword}`);
+    const codeHash = await sha256(`${salt}:${finalPassword}`);
 
     // Calculate expiration time
     const expiresAt = Date.now() + expiresInHours * 60 * 60 * 1000;
@@ -107,7 +122,7 @@ export async function POST(request: NextRequest) {
     // Save to Firestore
     await db.collection('firstAccessCodes').doc(emailKey).set({
       email: cleanEmail,
-      temporaryPassword,
+      temporaryPassword: finalPassword,
       salt,
       codeHash,
       expiresAt,
@@ -121,7 +136,7 @@ export async function POST(request: NextRequest) {
     // For now, we'll log it and return the code (for development only)
     console.log(`First access code generated for ${cleanEmail}:`, {
       email: cleanEmail,
-      temporaryPassword,
+      temporaryPassword: finalPassword,
       expiresAt: new Date(expiresAt).toISOString(),
     });
 
@@ -131,7 +146,7 @@ export async function POST(request: NextRequest) {
       email: cleanEmail,
       // Note: In production, don't return the temporary password here
       // It should only be sent via email
-      temporaryPassword: process.env.NODE_ENV === 'development' ? temporaryPassword : undefined,
+      temporaryPassword: process.env.NODE_ENV === 'development' ? finalPassword : undefined,
       expiresAt: new Date(expiresAt).toISOString(),
     });
   } catch (error) {

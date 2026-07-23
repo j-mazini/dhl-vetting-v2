@@ -26,8 +26,45 @@
 .subtitle {
   font-size: 14px;
   color: #6b7280;
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   line-height: 1.5;
+}
+
+.modeToggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background-color: #f3f4f6;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.modeBtn {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modeBtn:hover:not(:disabled) {
+  color: #374151;
+}
+
+.modeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modeBtnActive {
+  background-color: white;
+  color: #bf1d23;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .form {

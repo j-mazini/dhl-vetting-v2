@@ -6,7 +6,9 @@ import styles from './GenerateFirstAccessCode.module.css';
 
 export function GenerateFirstAccessCode() {
   const { user, isAuthenticated } = useAuth();
+  const [mode, setMode] = useState<'auto' | 'manual'>('auto');
   const [email, setEmail] = useState('');
+  const [manualPassword, setManualPassword] = useState('');
   const [expiresInHours, setExpiresInHours] = useState('24');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +31,12 @@ export function GenerateFirstAccessCode() {
     setError('');
     setSuccess(false);
     setResult(null);
+
+    if (mode === 'manual' && manualPassword.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -47,6 +55,7 @@ export function GenerateFirstAccessCode() {
         body: JSON.stringify({
           email: email.trim(),
           expiresInHours: parseInt(expiresInHours),
+          temporaryPassword: mode === 'manual' ? manualPassword : undefined,
         }),
       });
 
@@ -63,6 +72,7 @@ export function GenerateFirstAccessCode() {
         expiresAt: data.expiresAt,
       });
       setEmail('');
+      setManualPassword('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -89,6 +99,32 @@ export function GenerateFirstAccessCode() {
           Create a temporary password for new drivers to set up their accounts
         </p>
 
+        <div className={styles.modeToggle}>
+          <button
+            type="button"
+            className={`${styles.modeBtn} ${mode === 'auto' ? styles.modeBtnActive : ''}`}
+            onClick={() => {
+              setMode('auto');
+              setManualPassword('');
+              setError('');
+            }}
+            disabled={loading}
+          >
+            Auto Generate
+          </button>
+          <button
+            type="button"
+            className={`${styles.modeBtn} ${mode === 'manual' ? styles.modeBtnActive : ''}`}
+            onClick={() => {
+              setMode('manual');
+              setError('');
+            }}
+            disabled={loading}
+          >
+            Manual Password
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <label htmlFor="email" className={styles.label}>
@@ -105,6 +141,27 @@ export function GenerateFirstAccessCode() {
               className={styles.input}
             />
           </div>
+
+          {mode === 'manual' && (
+            <div className={styles.field}>
+              <label htmlFor="manualPassword" className={styles.label}>
+                Temporary Password
+              </label>
+              <input
+                id="manualPassword"
+                type="password"
+                value={manualPassword}
+                onChange={(e) => setManualPassword(e.target.value)}
+                placeholder="Enter a password (min 6 chars)"
+                required={mode === 'manual'}
+                disabled={loading}
+                className={styles.input}
+              />
+              <small className={styles.hint}>
+                Minimum 6 characters. This will be sent to the driver.
+              </small>
+            </div>
+          )}
 
           <div className={styles.field}>
             <label htmlFor="expiresInHours" className={styles.label}>
