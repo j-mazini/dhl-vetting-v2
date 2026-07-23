@@ -3,19 +3,15 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { SetFirstPassword } from './SetFirstPassword';
-import { SetNewPasswordModal } from './SetNewPasswordModal';
 import styles from './DriverLogin.module.css';
 
 export function DriverLogin() {
   const { signInWithGoogle, signInWithEmail, loading } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [temporaryPassword, setTemporaryPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showFirstPassword, setShowFirstPassword] = useState(false);
-  const [showSetNewPassword, setShowSetNewPassword] = useState(false);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,9 +19,8 @@ export function DriverLogin() {
     setIsSubmitting(true);
 
     try {
-      await signInWithEmail(email, temporaryPassword);
-      // Show modal to set new password
-      setShowSetNewPassword(true);
+      await signInWithEmail(email, password);
+      router.push('/vetting/dashboard');
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.',
@@ -49,18 +44,7 @@ export function DriverLogin() {
     }
   };
 
-  const handleSetNewPasswordSuccess = () => {
-    setShowSetNewPassword(false);
-    setEmail('');
-    setTemporaryPassword('');
-    router.push('/vetting/dashboard');
-  };
-
   const isLoading = loading || isSubmitting;
-
-  if (showFirstPassword) {
-    return <SetFirstPassword onBack={() => setShowFirstPassword(false)} />;
-  }
 
   return (
     <div className={styles.container}>
@@ -118,19 +102,18 @@ export function DriverLogin() {
 
             <div className={styles.field}>
               <label htmlFor="password" className={styles.label}>
-                Temporary Password
+                Password
               </label>
               <input
                 id="password"
                 type="password"
-                value={temporaryPassword}
-                onChange={(e) => setTemporaryPassword(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 disabled={isLoading}
                 className={styles.input}
               />
-              <small className={styles.hint}>Enter the password sent to your email</small>
             </div>
 
             {error && <div className={styles.error}>{error}</div>}
@@ -150,16 +133,6 @@ export function DriverLogin() {
           </p>
         </div>
       </div>
-
-      <SetNewPasswordModal
-        isOpen={showSetNewPassword}
-        onClose={() => {
-          setShowSetNewPassword(false);
-          setEmail('');
-          setTemporaryPassword('');
-        }}
-        onSuccess={handleSetNewPasswordSuccess}
-      />
     </div>
   );
 }
