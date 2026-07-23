@@ -248,12 +248,17 @@ service cloud.firestore {
     match /passwordResetTokens/{code} {
       allow get: if true;
       allow list: if false;
-      allow create: if true;
-      allow update: if !resource.data.used
+      allow create: if request.resource.data.email is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.used == false;
+      allow update: if resource.data.used == false
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'used',
           'usedAt'
-        ]);
+        ])
+        && request.resource.data.used == true;
+      allow delete: if isAdmin();
     }
   }
 }
