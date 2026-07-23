@@ -194,3 +194,22 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.adminLink {
+  margin-top: 12px !important;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.adminButton {
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.adminButton:hover {
+  color: #bf1d23;
+  text-decoration: underline;
+}
