@@ -67,12 +67,12 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         documentRegistration: false,
         docTypes: ['British/Irish', 'Passport + Online Share Code', 'Visa / eVisa + Online Share Code'],
         docFields: [
-          { key: 'rtw_review_status', label: 'Review status', type: 'select', adminReview: true, options: ['Accepted', 'Rejected', 'Not applicable'], required: true },
           { key: 'rtw_type', label: 'Right to Work', type: 'select', options: ['British/Irish', 'Passport + Online Share Code', 'Visa / eVisa + Online Share Code', 'Not applicable'], required: true },
           { key: 'rtw_number', label: 'Document number', type: 'text', placeholder: 'Document number or N/A', required: true },
           { key: 'rtw_expiry', label: 'Expiry date', type: 'date' },
           { key: 'rtw_share_code', label: 'Share code', type: 'text', placeholder: 'e.g. W12 345 678', hint: 'Required only for online Right to Work routes.' },
-          { key: 'rtw_check_date', label: 'RTW check date', type: 'date', adminReview: true },
+          { key: 'rtw_review_status', label: 'Decision', type: 'select', adminReview: true, options: ['Accept', 'Reject', 'Cannot evaluate'], required: true },
+          { key: 'rtw_check_date', label: 'Check date', type: 'date', adminReview: true, required: true },
         ],
         links: [
           { label: 'Check RTW Share Code', url: 'https://www.gov.uk/view-right-to-work' },
@@ -88,12 +88,13 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         documentRegistration: false,
         docTypes: ['UK Drive License', 'EU', 'Not applicable'],
         docFields: [
-          { key: 'dvla_review_status', label: 'Review status', type: 'select', adminReview: true, options: ['Accepted', 'Rejected', 'Not applicable'], required: true },
           { key: 'dvla_type', label: 'Licence type', type: 'select', options: ['UK Drive License', 'EU', 'Not applicable'], required: true },
-          { key: 'dvla_number', label: 'Drive License Number', type: 'text', placeholder: 'Drive License Number or N/A', required: true },
+          { key: 'dvla_number', label: 'Licence number', type: 'text', placeholder: 'Licence number or N/A', required: true },
           { key: 'dvla_expiry', label: 'Expiry date', type: 'date', adminReview: true },
-          { key: 'dvla_country', label: 'Country of issue', type: 'text', placeholder: 'e.g. UK, Italy, N/A' },
+          { key: 'dvla_country', label: 'Country', type: 'text', placeholder: 'e.g. UK, Italy, N/A' },
           { key: 'dvla_share_code', label: 'DVLA share code', type: 'text', placeholder: 'UK Drive License only' },
+          { key: 'dvla_review_status', label: 'Decision', type: 'select', adminReview: true, options: ['Accept', 'Reject', 'Cannot evaluate'], required: true },
+          { key: 'dvla_check_date', label: 'Check date', type: 'date', adminReview: true, required: true },
         ],
         links: [
           { label: 'DVLA Driving Check', url: 'https://www.gov.uk/check-driving-information' },
@@ -111,7 +112,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         messageSlot: 'candidate-confirmation',
       },
       {
-        title: 'BA Application Form downloaded and signature status confirmed',
+        title: 'Application Form status confirmed',
         required: true,
         docKey: 'application_form',
         requiredDownload: {
@@ -120,11 +121,9 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
           trackingField: 'applicationFormDownloadedAt',
         },
         docFields: [
-          { key: 'signature_status', label: 'Application Form signature status', type: 'select', options: ['Signed', 'Awaiting signature', 'Sent for signature', 'Signature failed'], required: true },
+          { key: 'signature_status', label: 'Signature', type: 'select', options: ['Signed', 'Awaiting signature', 'Sent for signature', 'Signature failed'], required: true },
           { key: 'signed_at', label: 'Signed on', type: 'date' },
           { key: 'signer_name', label: 'Signer name', type: 'text' },
-          { key: 'signer_email', label: 'Signer email', type: 'text' },
-          { key: 'signature_text', label: 'Typed signature', type: 'text' },
         ],
       },
       {
@@ -141,14 +140,14 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
     items: [
       {
         sectionHeader: '2.1 Pre-Interview',
-        title: 'Interview Information Recorded',
+        title: 'Interview recorded',
         required: true,
-        detail: 'Interview Date, Start Time, End Time, Location, Interviewer and Supervisor recorded.',
+        detail: 'Interview date, time, location, interviewer and supervisor.',
         docKey: 'interview_record',
         docFields: [
-          { key: 'int_date', label: 'Interview Date', type: 'date', required: true },
-          { key: 'int_start_time', label: 'Start Time', type: 'text', placeholder: 'HH:MM', required: true },
-          { key: 'int_end_time', label: 'End Time', type: 'text', placeholder: 'HH:MM', required: true },
+          { key: 'int_date', label: 'Date', type: 'date', required: true },
+          { key: 'int_start_time', label: 'Start time', type: 'text', placeholder: 'HH:MM', required: true },
+          { key: 'int_end_time', label: 'End time', type: 'text', placeholder: 'HH:MM', required: true },
           { key: 'int_location', label: 'Location', type: 'text', required: true },
           { key: 'int_interviewer', label: 'Interviewer', type: 'text', required: true },
           { key: 'int_supervisor', label: 'Supervisor', type: 'text', required: true },
@@ -156,11 +155,11 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         messageSlot: 'interview-invitation',
       },
       {
-        title: 'Payment mode and company behaviour document downloaded',
+        title: 'Briefing document reviewed',
         required: true,
-        detail: 'Placeholder for the payment mode and company behaviour briefing document.',
+        detail: 'Payment mode and company behaviour briefing.',
         placeholderDownload: {
-          label: 'Download briefing document',
+          label: 'Download briefing',
           documentName: 'BA Express Payment Mode and Company Behaviour Briefing.pdf',
         },
       },
@@ -170,8 +169,9 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         required: true,
         docKey: 'competency_scores',
         docFields: [
-          { key: 'total_score', label: 'Total score', type: 'text', placeholder: '0-35', required: true },
-          { key: 'score_band', label: 'Score band', type: 'select', options: ['27+ Recommended', '22-26 Consider', '20-21 Borderline', '<20 Not recommended'], required: true },
+          { key: 'total_score', label: 'Score', type: 'text', placeholder: '0-35', required: true },
+          { key: 'score_band', label: 'Band', type: 'select', options: ['27+ Recommended', '22-26 Consider', '20-21 Borderline', '<20 Not recommended'], required: true },
+          { key: 'competency_check_date', label: 'Date scored', type: 'date', required: true },
         ],
       },
       {
@@ -188,8 +188,8 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         required: true,
         docKey: 'dbs_collect_request',
         docFields: [
-          { key: 'dbs_collection_status', label: 'DBS action', type: 'select', options: ['Collected', 'Requested'], required: true },
-          { key: 'dbs_collection_date', label: 'Action date', type: 'date', required: true },
+          { key: 'dbs_collection_status', label: 'Action', type: 'select', options: ['Collected', 'Requested'], required: true },
+          { key: 'dbs_collection_date', label: 'Date', type: 'date', required: true },
           { key: 'dbs_collection_notes', label: 'Notes', type: 'text', placeholder: 'Collection/request details...' },
         ],
       },
@@ -217,19 +217,17 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         required: true,
         docKey: 'red_flags',
         docFields: [
-          { key: 'immediate_concerns', label: 'Applicant red flags checklist', type: 'text', placeholder: 'List red flags or write None', required: true },
+          { key: 'immediate_concerns', label: 'Red flags', type: 'text', placeholder: 'List red flags or write None', required: true },
           { key: 'performance_concerns', label: 'Performance concerns', type: 'text', placeholder: 'List performance concerns or write None' },
-          { key: 'red_flag_notes', label: 'Red flag notes', type: 'text' },
         ],
       },
       {
-        title: 'Finish interview',
+        title: 'Interview decision',
         required: true,
         docKey: 'interview_finish',
         docFields: [
-          { key: 'interview_finish_status', label: 'Interview finish status', type: 'select', options: ['Not Suitable', 'Passed Interview but preceed with caution', 'Suitable'], required: true },
-          { key: 'interview_finish_date', label: 'Finish date', type: 'date', required: true },
-          { key: 'interview_finish_notes', label: 'Finish notes', type: 'text' },
+          { key: 'interview_finish_status', label: 'Decision', type: 'select', options: ['Not Suitable', 'Proceed with caution', 'Suitable'], required: true },
+          { key: 'interview_finish_date', label: 'Date', type: 'date', required: true },
         ],
       },
       {
@@ -238,19 +236,21 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         required: true,
         docKey: 'reference_workflow',
         docFields: [
-          { key: 'reference_statuses', label: 'Reference statuses', type: 'text', placeholder: 'Employer A: Email sent / Responded / Approved' },
-          { key: 'reference_outcome', label: 'Reference outcome', type: 'select', options: ['Approved', 'Risk Assessment', 'Rejected', 'Waiting'] },
+          { key: 'reference_statuses', label: 'Status', type: 'text', placeholder: 'Employer A: Sent / Responded / Approved' },
+          { key: 'reference_outcome', label: 'Decision', type: 'select', options: ['Approved', 'Risk Assessment', 'Rejected', 'Waiting'], required: true },
+          { key: 'reference_check_date', label: 'Check date', type: 'date', required: true },
         ],
       },
       {
-        title: 'DBS',
+        title: 'DBS Review',
         required: true,
         docKey: 'uk_crc',
         docFields: [
           { key: 'crc_type', label: 'Certificate type', type: 'select', options: ['DBS (England/Wales)', 'Disclosure Scotland', 'NI DBS'], required: true },
-          { key: 'dbs_document_status', label: 'Document Status', type: 'select', options: ['No Records', 'With convictions'], required: true },
+          { key: 'dbs_document_status', label: 'Status', type: 'select', options: ['No Records', 'With convictions'], required: true },
           { key: 'crc_reference', label: 'Reference number', type: 'text', required: true },
-          { key: 'dbs_decision', label: 'DBS approval decision', type: 'select', options: ['Approved', 'Reproved'], required: true },
+          { key: 'dbs_decision', label: 'Decision', type: 'select', options: ['Approved', 'Reproved'], required: true },
+          { key: 'dbs_check_date', label: 'Check date', type: 'date', required: true },
         ],
       },
       {
@@ -293,18 +293,16 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         required: true,
         docKey: 'criminal_record_declaration',
         docFields: [
-          { key: 'declared_criminal_record', label: 'Candidate has declared a criminal record', type: 'select', options: ['No', 'Yes'], required: true },
-          { key: 'criminal_record_notes', label: 'Declaration notes', type: 'text' },
+          { key: 'declared_criminal_record', label: 'Criminal record declared', type: 'select', options: ['No', 'Yes'], required: true },
         ],
       },
       {
-        title: 'Declaration of Suitability signed',
+        title: 'Suitability declaration signed',
         required: true,
         docKey: 'suitability_declaration',
         docFields: [
-          { key: 'manager_name', label: 'Recruiting Manager name', type: 'text', placeholder: 'Full name', required: true },
-          { key: 'declaration_date', label: 'Declaration date', type: 'date', required: true },
-          { key: 'declaration_signed', label: 'Declaration signed', type: 'select', options: ['Yes', 'No'], required: true },
+          { key: 'manager_name', label: 'Manager name', type: 'text', placeholder: 'Full name', required: true },
+          { key: 'declaration_date', label: 'Date', type: 'date', required: true },
         ],
       },
       {
@@ -326,16 +324,14 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
     sla: 'Before driver start',
     items: [
       {
-        title: 'Training courses booked and status recorded',
+        title: 'Training courses booked and recorded',
         required: true,
         docKey: 'cot_course',
         docFields: [
-          { key: 'cot_book_date', label: 'Book date', type: 'date', required: true },
-          { key: 'cot_status', label: 'Status', type: 'select', options: ['Booked', 'Completed', 'Failed', 'Not required'], required: true },
-          { key: 'manual_handling_date', label: 'Manual Handling Date', type: 'date', required: true },
-          { key: 'manual_handling_status', label: 'Manual Handling Status', type: 'select', options: ['Booked', 'Completed', 'Not required'], required: true },
-          { key: 'dangerous_goods_date', label: 'Dangerous Goods Date', type: 'date', required: true },
-          { key: 'dangerous_goods_status', label: 'Dangerous Goods Status', type: 'select', options: ['Booked', 'Completed', 'Not required'], required: true },
+          { key: 'cot_status', label: 'Induction', type: 'select', options: ['Booked', 'Completed', 'Failed', 'Not required'], required: true },
+          { key: 'manual_handling_status', label: 'Manual Handling', type: 'select', options: ['Booked', 'Completed', 'Not required'], required: true },
+          { key: 'dangerous_goods_status', label: 'Dangerous Goods', type: 'select', options: ['Booked', 'Completed', 'Not required'], required: true },
+          { key: 'cot_book_date', label: 'Training date', type: 'date', required: true },
         ],
       },
       {
@@ -358,14 +354,14 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         ],
       },
       {
-        title: 'DHL folder organised, physical copies present and delivered',
+        title: 'DHL folder delivered and approved',
         required: true,
         docKey: 'dhl_folder',
         docFields: [
           { key: 'folder_organized', label: 'Folder organized', type: 'select', options: ['Yes', 'No'], required: true },
-          { key: 'physical_copies_present', label: 'Physical copies present', type: 'select', options: ['Yes', 'No'], required: true },
-          { key: 'sent_to_folder', label: 'Sent to folder', type: 'select', options: ['Pending', 'Yes', 'No', 'Not applicable'], required: true },
-          { key: 'dhl_status', label: 'DHL status', type: 'select', options: ['Pending', 'Approved in writing', 'Rejected'], required: true },
+          { key: 'physical_copies_present', label: 'Copies present', type: 'select', options: ['Yes', 'No'], required: true },
+          { key: 'dhl_status', label: 'Status', type: 'select', options: ['Pending', 'Approved', 'Rejected'], required: true },
+          { key: 'dhl_delivery_date', label: 'Delivery date', type: 'date', required: true },
         ],
       },
       { title: 'Driver application completed', required: true },

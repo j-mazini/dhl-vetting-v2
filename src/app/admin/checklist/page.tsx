@@ -18,7 +18,6 @@ import { auth } from '@/lib/firebase';
 import { CaseRegistrationPanel, type CaseRegistrationField } from './components/CaseRegistrationPanel';
 import { ExportActions } from './components/ExportActions';
 import { ChecklistRow, type AdminWorkHistoryEntry } from './components/ChecklistRow';
-import { InitialInfoReview } from './components/InitialInfoReview';
 import { CHECKLIST_STEPS, type ChecklistItem } from './data/checklist';
 import {
   completion,
@@ -1884,7 +1883,6 @@ export default function AdminChecklistPage() {
                                     );
                                   })}
                                 </div>
-                                {idx === 0 && <InitialInfoReview candidate={selected} />}
                                 <div className={styles.stepApproveBar}>
                                   {isApproved ? (
                                     <div className={styles.stepActionStack}>
