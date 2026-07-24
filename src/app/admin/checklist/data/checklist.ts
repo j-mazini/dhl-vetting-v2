@@ -124,6 +124,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
           { key: 'signature_status', label: 'Signature', type: 'select', options: ['Signed', 'Awaiting signature', 'Sent for signature', 'Signature failed'], required: true },
           { key: 'signed_at', label: 'Signed on', type: 'date' },
           { key: 'signer_name', label: 'Signer name', type: 'text' },
+          { key: 'form_check_date', label: 'Confirmation date', type: 'date', required: true },
         ],
       },
       {
@@ -210,6 +211,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         docKey: 'interview_notes',
         docFields: [
           { key: 'interview_notes', label: 'Interview notes', type: 'text', placeholder: 'Describe the interview, observations and context...', required: true },
+          { key: 'notes_date', label: 'Date recorded', type: 'date', required: true },
         ],
       },
       {
@@ -219,6 +221,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         docFields: [
           { key: 'immediate_concerns', label: 'Red flags', type: 'text', placeholder: 'List red flags or write None', required: true },
           { key: 'performance_concerns', label: 'Performance concerns', type: 'text', placeholder: 'List performance concerns or write None' },
+          { key: 'red_flags_date', label: 'Date reviewed', type: 'date', required: true },
         ],
       },
       {
@@ -273,6 +276,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         docFields: [
           { key: 'final_decision', label: 'Final decision', type: 'select', options: ['Approved', 'Reproved'], required: true },
           { key: 'final_decision_reason', label: 'Decision notes', type: 'text' },
+          { key: 'final_decision_date', label: 'Decision date', type: 'date', required: true },
         ],
       },
       {
@@ -294,6 +298,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         docKey: 'criminal_record_declaration',
         docFields: [
           { key: 'declared_criminal_record', label: 'Criminal record declared', type: 'select', options: ['No', 'Yes'], required: true },
+          { key: 'criminal_declaration_date', label: 'Date recorded', type: 'date', required: true },
         ],
       },
       {
@@ -314,6 +319,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
           { key: 'development_areas', label: 'Areas for development', type: 'text', placeholder: 'Gaps or concerns noted...' },
           { key: 'candidate_questions', label: 'Questions asked by candidate', type: 'text', placeholder: 'Questions raised by the candidate...' },
           { key: 'overall_impression', label: 'Overall impression', type: 'text', required: true },
+          { key: 'observations_date', label: 'Date recorded', type: 'date', required: true },
         ],
       },
     ],
@@ -342,6 +348,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
           { key: 'originals_seen', label: 'Originals seen', type: 'select', options: ['Yes', 'No'], required: true },
           { key: 'copies_filed', label: 'Copies filed', type: 'select', options: ['Yes', 'No'], required: true },
           { key: 'collection_notes', label: 'Notes', type: 'text' },
+          { key: 'collection_date', label: 'Collection date', type: 'date', required: true },
         ],
       },
       {
@@ -351,6 +358,7 @@ export const CHECKLIST_STEPS: ChecklistStep[] = [
         docFields: [
           { key: 'payment_mode', label: 'Cost model', type: 'select', options: ['DAF', 'DR', 'FSR', 'VSR'], required: true },
           { key: 'payment_notes', label: 'Payment notes', type: 'text' },
+          { key: 'payment_date', label: 'Date recorded', type: 'date', required: true },
         ],
       },
       {
